@@ -1,0 +1,58 @@
+# Build artifacts
+/bin/
+/build/
+/.cache/
+
+# Compiled object files
+*.o
+*.obj
+*.exe
+*.out
+*.app
+
+# IDE and editor files
+/.vscode/
+/.idea/
+*.swp
+*.swo
+*~
+.clangd/
+compile_commands.json
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+
+# Configuration files (keep examples)
+*.conf
+!example.conf
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Compiled libraries
+*.so
+*.dylib
+*.dll
+*.a
+*.lib
+
+# Log files
+*.log
+
+# Package files
+*.zip
+*.tar.gz
+*.rar
+
+# Backup files
+*.bak
+*.backup
+*~
