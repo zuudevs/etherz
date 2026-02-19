@@ -10,12 +10,12 @@ Core networking primitives are implemented. The library provides IPv4/IPv6 addre
 
 **Goal:** Complete the transport layer and make sockets production-ready.
 
-- [ ] `Socket<Ip<6>>` — IPv6 socket specialization
-- [ ] `UdpSocket<T>` — UDP datagram socket wrapper
-- [ ] `Udp<T>` — UDP endpoint struct (analogous to `Tcp<T>`)
-- [ ] Socket options: `set_reuse_addr()`, `set_nonblocking()`, `set_timeout()`
-- [ ] `Socket::shutdown()` — Graceful half-close (SHUT_RD, SHUT_WR, SHUT_RDWR)
-- [ ] Improve error mapping — Map platform error codes (`WSAGetLastError` / `errno`) to `core::Error`
+- [x] `Socket<Ip<6>>` — IPv6 socket specialization
+- [x] `UdpSocket<T>` — UDP datagram socket wrapper
+- [x] `Udp<T>` — UDP endpoint struct (analogous to `Tcp<T>`)
+- [x] Socket options: `set_reuse_addr()`, `set_nonblocking()`, `set_timeout()`
+- [x] `Socket::shutdown()` — Graceful half-close (SHUT_RD, SHUT_WR, SHUT_RDWR)
+- [x] Improve error mapping — Map platform error codes (`WSAGetLastError` / `errno`) to `core::Error`
 
 ---
 

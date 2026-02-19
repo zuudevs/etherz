@@ -2,6 +2,9 @@
 #include "net/internet_protocol.hpp"
 #include "net/socket_address.hpp"
 #include "net/tcp.hpp"
+#include "net/udp.hpp"
+#include "net/socket.hpp"
+#include "net/udp_socket.hpp"
 #include "core/error.hpp"
 #include <print>
 #include <windows.h>
@@ -113,16 +116,75 @@ int main() {
 	tcp6.display();
 	std::print("\n");
 
-	// ─── Error Types ────────────────────
-	std::print("── Error Types ───────────────────\n");
+	// ─── UDP Endpoints (v0.2.0) ────────
+	std::print("── UDP Endpoints ─────────────────\n");
+
+	auto udp4 = etn::Udp<etn::Ip<4>>(etn::Ip(8, 8, 8, 8), 53);
+	auto udp6 = etn::Udp<etn::Ip<6>>(etn::Ip<6>{"::1"}, 5353);
+
+	udp4.display();
+	udp6.display();
+	std::print("\n");
+
+	// ─── Socket Options (v0.2.0) ───────
+	std::print("── Socket Options (v0.2.0) ───────\n");
+	{
+		etn::Socket<etn::Ip<4>> sock;
+		auto err = sock.create();
+		std::print("create : {}\n", etc::error_message(err));
+
+		err = sock.set_reuse_addr(true);
+		std::print("reuse  : {}\n", etc::error_message(err));
+
+		err = sock.set_nonblocking(true);
+		std::print("nonblk : {}\n", etc::error_message(err));
+
+		err = sock.set_timeout(5000);
+		std::print("timeout: {}\n", etc::error_message(err));
+
+		err = sock.shutdown(etc::ShutdownMode::Both);
+		std::print("shutdn : {} (expected: not connected)\n", etc::error_message(err));
+		// sock auto-closes here (RAII)
+	}
+	std::print("\n");
+
+	// ─── IPv6 Socket (v0.2.0) ──────────
+	std::print("── IPv6 Socket (v0.2.0) ──────────\n");
+	{
+		etn::Socket<etn::Ip<6>> sock6;
+		auto err = sock6.create();
+		std::print("IPv6 socket create: {}\n", etc::error_message(err));
+		std::print("IPv6 socket open  : {}\n", sock6.is_open());
+	}
+	std::print("\n");
+
+	// ─── UdpSocket (v0.2.0) ────────────
+	std::print("── UdpSocket (v0.2.0) ────────────\n");
+	{
+		etn::UdpSocket<etn::Ip<4>> udp_sock;
+		auto err = udp_sock.create();
+		std::print("UDP create : {}\n", etc::error_message(err));
+
+		err = udp_sock.set_reuse_addr(true);
+		std::print("UDP reuse  : {}\n", etc::error_message(err));
+
+		std::print("UDP open   : {}\n", udp_sock.is_open());
+	}
+	std::print("\n");
+
+	// ─── Error Mapping (v0.2.0) ────────
+	std::print("── Error Types & Mapping ─────────\n");
 
 	auto err1 = etc::Error::None;
 	auto err2 = etc::Error::ConnectionRefused;
+	auto err3 = etc::Error::WouldBlock;
 
 	std::print("{}: {} (ok={})\n", 
 		static_cast<int>(err1), etc::error_message(err1), etc::is_ok(err1));
 	std::print("{}: {} (ok={})\n", 
 		static_cast<int>(err2), etc::error_message(err2), etc::is_ok(err2));
+	std::print("{}: {} (ok={})\n",
+		static_cast<int>(err3), etc::error_message(err3), etc::is_ok(err3));
 	std::print("\n");
 
 	// ─── Comparison ─────────────────────
