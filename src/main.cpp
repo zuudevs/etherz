@@ -8,6 +8,11 @@
 #include "async/poll.hpp"
 #include "async/event_loop.hpp"
 #include "async/async_socket.hpp"
+#include "protocol/url.hpp"
+#include "protocol/http.hpp"
+#include "protocol/http_client.hpp"
+#include "protocol/http_server.hpp"
+#include "protocol/websocket.hpp"
 #include "core/error.hpp"
 #include <print>
 #include <windows.h>
@@ -15,6 +20,7 @@
 namespace etn = etherz::net;
 namespace etc = etherz::core;
 namespace eta = etherz::async;
+namespace etp = etherz::protocol;
 
 /**
  * @brief Initialize console to properly handle UTF-8 output.
@@ -244,6 +250,81 @@ int main() {
 
 		err = async_sock.set_reuse_addr(true);
 		std::print("Async reuse    : {}\n", etc::error_message(err));
+	}
+	std::print("\n");
+
+	// ─── URL Parsing (v0.4.0) ──────────
+	std::print("── URL Parsing (v0.4.0) ──────────\n");
+	{
+		auto url = etp::Url::parse("http://example.com:8080/api/v1?key=val#section");
+		url.display();
+
+		auto url2 = etp::Url::parse("https://localhost/index.html");
+		url2.display();
+		std::print("Reconstructed: {}\n", url2.to_string());
+	}
+	std::print("\n");
+
+	// ─── HTTP Core (v0.4.0) ────────────
+	std::print("── HTTP Core (v0.4.0) ────────────\n");
+	{
+		// Build & serialize a request
+		etp::HttpRequest req;
+		req.method = etp::HttpMethod::Post;
+		req.path = "/api/data";
+		req.headers.set("Host", "example.com");
+		req.headers.set("Content-Type", "application/json");
+		req.body = R"({"key":"value"})";
+		req.display();
+		std::print("Serialized ({} bytes)\n", req.serialize().size());
+
+		// Parse a raw response
+		std::string_view raw_resp =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/html\r\n"
+			"\r\n"
+			"<h1>Hello</h1>";
+		auto resp = etp::http_parser::parse_response(raw_resp);
+		resp.display();
+		std::print("Body: {}\n", resp.body);
+	}
+	std::print("\n");
+
+	// ─── HttpServer routes (v0.4.0) ─────
+	std::print("── HttpServer (v0.4.0) ───────────\n");
+	{
+		etp::HttpServer server;
+		server.get("/", [](const etp::HttpRequest&) {
+			etp::HttpResponse r;
+			r.status = etp::HttpStatus::OK;
+			r.body = "Hello, World!";
+			return r;
+		});
+		server.post("/echo", [](const etp::HttpRequest& req) {
+			etp::HttpResponse r;
+			r.status = etp::HttpStatus::OK;
+			r.body = req.body;
+			return r;
+		});
+		std::print("Routes registered: {}\n", server.route_count());
+	}
+	std::print("\n");
+
+	// ─── WebSocket Frames (v0.4.0) ──────
+	std::print("── WebSocket (v0.4.0) ────────────\n");
+	{
+		// Encode a text frame
+		etp::WsFrame frame;
+		frame.set_text("Hello WS!");
+		frame.display();
+
+		auto encoded = etp::ws_encode_frame(frame);
+		std::print("Encoded: {} bytes\n", encoded.size());
+
+		// Decode it back
+		auto decoded = etp::ws_decode_frame(encoded);
+		decoded.display();
+		std::print("Payload: {}\n", decoded.payload_text());
 	}
 	std::print("\n");
 

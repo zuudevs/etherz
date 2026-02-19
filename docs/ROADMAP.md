@@ -35,11 +35,11 @@ Core networking primitives are implemented. The library provides IPv4/IPv6 addre
 
 **Goal:** Provide ready-to-use protocol implementations.
 
-- [ ] `HttpRequest` / `HttpResponse` — Basic HTTP/1.1 parser
-- [ ] `HttpClient` — Simple HTTP client
-- [ ] `HttpServer` — Lightweight HTTP server
-- [ ] `WebSocket` — WebSocket protocol support
-- [ ] URL parsing utility
+- [x] `HttpRequest` / `HttpResponse` — Basic HTTP/1.1 parser
+- [x] `HttpClient` — Simple HTTP client
+- [x] `HttpServer` — Lightweight HTTP server
+- [x] `WebSocket` — WebSocket protocol support
+- [x] URL parsing utility
 
 ---
 

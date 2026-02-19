@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] — 2026-02-19
+
+### Added
+
+- **`etherz::protocol` namespace** — Higher-level protocol implementations
+
+- **`Url`** — URL parser
+  - `Url::parse()` extracts scheme, host, port, path, query, fragment
+  - `to_string()` reconstruction, default port inference (http→80, https→443)
+
+- **`HttpMethod`** / **`HttpStatus`** enums with string converters
+- **`HttpHeaders`** — Case-insensitive key-value header map
+- **`HttpRequest`** / **`HttpResponse`** — Serialization and display
+- **`http_parser`** — `parse_request()` / `parse_response()` from raw HTTP strings
+
+- **`HttpClient`** — Synchronous HTTP/1.1 client
+  - `get(Url)` / `post(Url, body)` → `HttpClient::Result`
+
+- **`HttpServer`** — Lightweight HTTP server with route registration
+  - `route(method, path, handler)` / `get()` / `post()` shorthands
+  - `listen(addr)` / `handle_one()` / `stop()`
+
+- **`WsOpcode`** / **`WsFrame`** — WebSocket frame types
+  - `set_text()` / `set_binary()` / `payload_text()`
+  - `ws_encode_frame()` / `ws_decode_frame()` — RFC 6455 framing
+  - `ws_handshake_request()` / `ws_handshake_response()`
+
+---
+
 ## [0.3.0] — 2026-02-19
 
 ### Added

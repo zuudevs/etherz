@@ -65,6 +65,26 @@ Async create   : No error
 Async is_open  : true
 Async reuse    : No error
 
+ΓöÇΓöÇ URL Parsing (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+URL: scheme=http, host=example.com, port=8080, path=/api/v1, query=key=val, fragment=section
+URL: scheme=https, host=localhost, port=443, path=/index.html, query=, fragment=
+Reconstructed: https://localhost/index.html
+
+ΓöÇΓöÇ HTTP Core (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+HTTP Request: POST /api/data HTTP/1.1
+Serialized (113 bytes)
+HTTP Response: HTTP/1.1 200 OK
+Body: <h1>Hello</h1>
+
+ΓöÇΓöÇ HttpServer (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Routes registered: 2
+
+ΓöÇΓöÇ WebSocket (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+WsFrame: opcode=Text, fin=true, masked=false, payload_len=9
+Encoded: 11 bytes
+WsFrame: opcode=Text, fin=true, masked=false, payload_len=9
+Payload: Hello WS!
+
 ΓöÇΓöÇ Comparison ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 192.168.1.1 == 192.168.1.2 ? false
 192.168.1.1 <  192.168.1.2 ? true
