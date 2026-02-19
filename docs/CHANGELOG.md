@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.6.0] — 2026-02-19
+
+### Added
+
+- **`Dns`** — DNS resolution via `getaddrinfo` / `getnameinfo`
+  - `resolve(hostname)` → IPv4 + IPv6 addresses
+  - `resolve4()` / `resolve6()` — family-specific
+  - `reverse(Ip<4>)` → hostname string
+
+- **`Subnet<Ip<4>>`** — CIDR notation utilities
+  - `parse("192.168.1.0/24")`, `contains(ip)`, `mask()`, `network()`, `broadcast()`
+  - `host_count()`, `to_string()`
+
+- **`NetworkInterface`** — Local interface enumeration
+  - `list_interfaces()` → name, index, IPs, MAC, status
+  - Windows: `GetAdaptersAddresses`, POSIX: `getifaddrs`
+
+- **`ping(Ip<4>)`** — ICMP echo request
+  - `PingResult` with rtt, ttl, status
+  - Windows: `IcmpSendEcho`
+
+---
+
 ## [0.5.0] — 2026-02-19
 
 ### Added

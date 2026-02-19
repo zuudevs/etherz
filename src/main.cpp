@@ -16,6 +16,10 @@
 #include "security/tls_context.hpp"
 #include "security/tls_socket.hpp"
 #include "security/certificate.hpp"
+#include "net/dns.hpp"
+#include "net/subnet.hpp"
+#include "net/network_interface.hpp"
+#include "net/ping.hpp"
 #include "core/error.hpp"
 #include <print>
 #include <windows.h>
@@ -367,7 +371,68 @@ int main() {
 	}
 	std::print("\n");
 
-	// ─── Comparison ─────────────────────
+	// ─── DNS Resolution (v0.6.0) ───────
+	std::print("── DNS Resolution (v0.6.0) ───────\n");
+	{
+		auto dns_result = etn::Dns::resolve("localhost");
+		std::print("resolve('localhost'): {} address(es)\n", dns_result.count());
+		for (const auto& ip : dns_result.ipv4_addresses) {
+			std::print("  IPv4: "); ip.display();
+		}
+		for (const auto& ip : dns_result.ipv6_addresses) {
+			std::print("  IPv6: "); ip.display();
+		}
+
+		auto rev = etn::Dns::reverse(etn::Ip<4>(127, 0, 0, 1));
+		std::print("reverse(127.0.0.1) : {}\n", rev.empty() ? "(failed)" : rev);
+	}
+	std::print("\n");
+
+	// ─── Subnet / CIDR (v0.6.0) ────────
+	std::print("── Subnet / CIDR (v0.6.0) ────────\n");
+	{
+		auto subnet = etn::Subnet<etn::Ip<4>>::parse("192.168.1.0/24");
+		subnet.display();
+
+		auto ip_in  = etn::Ip<4>(192, 168, 1, 100);
+		auto ip_out = etn::Ip<4>(10, 0, 0, 1);
+		std::print("contains 192.168.1.100 ? {}\n", subnet.contains(ip_in));
+		std::print("contains 10.0.0.1      ? {}\n", subnet.contains(ip_out));
+		std::print("CIDR: {}\n", subnet.to_string());
+
+		std::print("Broadcast: "); subnet.broadcast().display();
+	}
+	std::print("\n");
+
+	// ─── Network Interfaces (v0.6.0) ───
+	std::print("── Network Interfaces (v0.6.0) ───\n");
+	{
+		auto ifaces = etn::list_interfaces();
+		std::print("Found {} interface(s)\n", ifaces.size());
+		for (const auto& iface : ifaces) {
+			if (iface.ipv4_addresses.empty() && iface.ipv6_addresses.empty()) continue;
+			std::print("  {} [{}] {}{}",
+				iface.name, iface.mac_string(),
+				iface.is_up ? "UP" : "DOWN",
+				iface.is_loopback ? " (lo)" : "");
+			for (const auto& ip : iface.ipv4_addresses) {
+				auto o = ip.bytes();
+				std::print(" {}.{}.{}.{}", o[0], o[1], o[2], o[3]);
+			}
+			std::print("\n");
+		}
+	}
+	std::print("\n");
+
+	// ─── Ping / ICMP (v0.6.0) ──────────
+	std::print("── Ping / ICMP (v0.6.0) ──────────\n");
+	{
+		auto ping_result = etn::ping(etn::Ip<4>(127, 0, 0, 1), 1000);
+		std::print("ping 127.0.0.1: ");
+		ping_result.display();
+	}
+	std::print("\n");
+
 	std::print("── Comparison ────────────────────\n");
 
 	auto cmp1 = etn::Ip(192, 168, 1, 1);

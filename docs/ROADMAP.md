@@ -58,11 +58,11 @@ Core networking primitives are implemented. The library provides IPv4/IPv6 addre
 
 **Goal:** DNS resolution and network discovery.
 
-- [ ] `Dns::resolve(hostname)` — Hostname to IP resolution
-- [ ] `Dns::reverse(ip)` — Reverse DNS lookup
-- [ ] `NetworkInterface` — List local network interfaces
-- [ ] Subnet / CIDR utilities (`Subnet<T>`, `contains()`, `mask()`)
-- [ ] Ping / ICMP utility
+- [x] `Dns::resolve(hostname)` — Hostname to IP resolution
+- [x] `Dns::reverse(ip)` — Reverse DNS lookup
+- [x] `NetworkInterface` — List local network interfaces
+- [x] Subnet / CIDR utilities (`Subnet<T>`, `contains()`, `mask()`)
+- [x] Ping / ICMP utility
 
 ---
 

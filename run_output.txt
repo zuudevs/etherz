@@ -105,6 +105,31 @@ Certificate:
   Fingerprint: AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99
   Key size   : 2048 bits
 
+ΓöÇΓöÇ DNS Resolution (v0.6.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+resolve('localhost'): 2 address(es)
+  IPv4: IPv4: 127.0.0.1
+  IPv6: IPv6: 0000:0000:0000:0000:0000:0000:0000:0001
+reverse(127.0.0.1) : Rafi-Indra
+
+ΓöÇΓöÇ Subnet / CIDR (v0.6.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Subnet: 192.168.1.0/24 (mask=IPv4: 255.255.255.0
+, hosts=254)
+contains 192.168.1.100 ? true
+contains 10.0.0.1      ? false
+CIDR: 192.168.1.0/24
+Broadcast: IPv4: 192.168.1.255
+
+ΓöÇΓöÇ Network Interfaces (v0.6.0) ΓöÇΓöÇΓöÇ
+Found 5 interface(s)
+  vEthernet (WSL (Hyper-V firewall)) [00:15:5D:2C:64:82] UP 172.22.112.1
+  Local Area Connection* 11 [F4:B3:01:F9:98:87] DOWN 169.254.77.183
+  Local Area Connection* 12 [F6:B3:01:F9:98:86] DOWN 169.254.3.234
+  Wi-Fi [F4:B3:01:F9:98:86] UP 192.168.1.30
+  Loopback Pseudo-Interface 1 [00:00:00:00:00:00] UP (lo) 127.0.0.1
+
+ΓöÇΓöÇ Ping / ICMP (v0.6.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ping 127.0.0.1: Ping: status=Success, rtt=0ms, ttl=128, bytes=12
+
 ΓöÇΓöÇ Comparison ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 192.168.1.1 == 192.168.1.2 ? false
 192.168.1.1 <  192.168.1.2 ? true
