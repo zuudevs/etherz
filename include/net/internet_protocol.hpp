@@ -207,9 +207,176 @@ public:
 template <typename A, typename B, typename C, typename D>
 Ip(A, B, C, D) -> Ip<4>;
 
+/**
+ * @brief IPv6 Specialization
+ */
 template <>
-class Ip<6> {
-    // TODO: Implement IPv6 using impl::IpBase<Ip<6>, uint16_t, 8> maybe?
+class Ip<6> : public impl::IpBase<Ip<6>, uint16_t, 8> {
+public:
+    static constexpr uint8_t version = 6;
+    using Base = impl::IpBase<Ip<6>, uint16_t, 8>;
+
+    // Constructors
+    constexpr Ip() noexcept = default;
+    constexpr Ip(const Ip&) noexcept = default;
+    constexpr Ip(Ip&&) noexcept = default;
+    constexpr Ip& operator=(const Ip&) noexcept = default;
+    constexpr Ip& operator=(Ip&&) noexcept = default;
+    constexpr auto operator<=>(const Ip&) const noexcept = default;
+    constexpr ~Ip() noexcept = default;
+
+    /**
+     * @brief Construct from 8 groups of uint16_t
+     */
+    constexpr Ip(
+        std::integral auto g0, std::integral auto g1, 
+        std::integral auto g2, std::integral auto g3,
+        std::integral auto g4, std::integral auto g5, 
+        std::integral auto g6, std::integral auto g7
+    ) noexcept {
+        m_address = {
+            static_cast<value_type>(g0), static_cast<value_type>(g1),
+            static_cast<value_type>(g2), static_cast<value_type>(g3),
+            static_cast<value_type>(g4), static_cast<value_type>(g5),
+            static_cast<value_type>(g6), static_cast<value_type>(g7)
+        };
+    }
+
+    /**
+     * @brief Parse IPv6 from string view (colon-separated hex).
+     * 
+     * Supports :: abbreviation for consecutive zero groups.
+     * Example: "2001:0db8::1" → 2001:0db8:0000:0000:0000:0000:0000:0001
+     */
+    constexpr Ip(std::string_view str) noexcept {
+        if (str.empty() || str.size() > 39) return;
+
+        // Find "::" position
+        size_t dcolon = str.size(); // no :: found sentinel
+        for (size_t i = 0; i + 1 < str.size(); ++i) {
+            if (str[i] == ':' && str[i + 1] == ':') {
+                dcolon = i;
+                break;
+            }
+        }
+
+        // Parse left side groups
+        size_t left_count = 0;
+        std::array<uint16_t, 8> left_groups{};
+        if (dcolon > 0) {
+            size_t start = 0;
+            for (size_t i = 0; i <= (dcolon < str.size() ? dcolon : str.size()); ++i) {
+                bool at_end = (dcolon < str.size()) ? (i == dcolon) : (i == str.size());
+                if (at_end || str[i] == ':') {
+                    if (start == i) { if (at_end) break; fill(0); return; }
+                    uint32_t val = 0;
+                    for (size_t k = start; k < i; ++k) {
+                        val <<= 4;
+                        char c = str[k];
+                        if (c >= '0' && c <= '9') val |= static_cast<uint32_t>(c - '0');
+                        else if (c >= 'a' && c <= 'f') val |= static_cast<uint32_t>(c - 'a' + 10);
+                        else if (c >= 'A' && c <= 'F') val |= static_cast<uint32_t>(c - 'A' + 10);
+                        else { fill(0); return; }
+                    }
+                    if (val > 0xFFFF) { fill(0); return; }
+                    if (left_count < 8) left_groups[left_count++] = static_cast<uint16_t>(val);
+                    else { fill(0); return; }
+                    start = i + 1;
+                }
+            }
+        }
+
+        // Parse right side groups (after ::)
+        size_t right_count = 0;
+        std::array<uint16_t, 8> right_groups{};
+        if (dcolon < str.size() && dcolon + 2 < str.size()) {
+            size_t rstart = dcolon + 2;
+            for (size_t i = rstart; i <= str.size(); ++i) {
+                if (i == str.size() || str[i] == ':') {
+                    if (rstart == i) { fill(0); return; }
+                    uint32_t val = 0;
+                    for (size_t k = rstart; k < i; ++k) {
+                        val <<= 4;
+                        char c = str[k];
+                        if (c >= '0' && c <= '9') val |= static_cast<uint32_t>(c - '0');
+                        else if (c >= 'a' && c <= 'f') val |= static_cast<uint32_t>(c - 'a' + 10);
+                        else if (c >= 'A' && c <= 'F') val |= static_cast<uint32_t>(c - 'A' + 10);
+                        else { fill(0); return; }
+                    }
+                    if (val > 0xFFFF) { fill(0); return; }
+                    if (right_count < 8) right_groups[right_count++] = static_cast<uint16_t>(val);
+                    else { fill(0); return; }
+                    rstart = i + 1;
+                }
+            }
+        }
+
+        // Validate total groups
+        if (dcolon >= str.size()) {
+            // No :: found, must have exactly 8 groups
+            if (left_count != 8) { fill(0); return; }
+            m_address = left_groups;
+        } else {
+            // :: expands zeros in the middle
+            if (left_count + right_count > 8) { fill(0); return; }
+            size_t zero_count = 8 - left_count - right_count;
+            for (size_t i = 0; i < left_count; ++i)
+                m_address[i] = left_groups[i];
+            for (size_t i = 0; i < zero_count; ++i)
+                m_address[left_count + i] = 0;
+            for (size_t i = 0; i < right_count; ++i)
+                m_address[left_count + zero_count + i] = right_groups[i];
+        }
+    }
+
+    // Arithmetic (operates on lowest 32 bits for simplicity)
+    constexpr Ip& operator++() noexcept {
+        for (int i = 7; i >= 0; --i) {
+            if (m_address[static_cast<size_t>(i)] < 0xFFFF) {
+                ++m_address[static_cast<size_t>(i)];
+                return *this;
+            }
+            m_address[static_cast<size_t>(i)] = 0;
+        }
+        return *this;
+    }
+
+    constexpr Ip operator++(int) noexcept {
+        auto rt = *this;
+        ++*this;
+        return rt;
+    }
+
+    constexpr Ip& operator--() noexcept {
+        for (int i = 7; i >= 0; --i) {
+            if (m_address[static_cast<size_t>(i)] > 0) {
+                --m_address[static_cast<size_t>(i)];
+                return *this;
+            }
+            m_address[static_cast<size_t>(i)] = 0xFFFF;
+        }
+        return *this;
+    }
+
+    constexpr Ip operator--(int) noexcept {
+        auto rt = *this;
+        --*this;
+        return rt;
+    }
+
+    /**
+     * @brief Fills all groups with a value.
+     */
+    constexpr void fill(std::integral auto val = 0) noexcept {
+        auto n_val = static_cast<uint16_t>(val);
+        m_address = {n_val, n_val, n_val, n_val, n_val, n_val, n_val, n_val};
+    }
+
+    inline void display() const noexcept {
+        std::print("IPv6: {:04x}:{:04x}:{:04x}:{:04x}:{:04x}:{:04x}:{:04x}:{:04x}\n",
+            m_address[0], m_address[1], m_address[2], m_address[3],
+            m_address[4], m_address[5], m_address[6], m_address[7]);
+    }
 };
 
 } // namespace net
