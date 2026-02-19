@@ -21,15 +21,16 @@
 #include "../net/socket.hpp"
 #include "../net/socket_address.hpp"
 #include "../net/internet_protocol.hpp"
+#include "../security/tls_socket.hpp"
 #include "../core/error.hpp"
 
 namespace etherz {
 namespace protocol {
 
 /**
- * @brief Simple synchronous HTTP/1.1 client
+ * @brief Simple synchronous HTTP/1.1 client with HTTPS support
  * 
- * Uses Socket<Ip<4>> to connect, send request, and receive response.
+ * Uses Socket<Ip<4>> for HTTP, TlsSocket<Ip<4>> for HTTPS.
  */
 class HttpClient {
 public:
@@ -42,7 +43,7 @@ public:
 	};
 
 	/**
-	 * @brief Perform a GET request
+	 * @brief Perform a GET request (auto-detects HTTP/HTTPS)
 	 */
 	Result get(const Url& url) {
 		HttpRequest req;
@@ -51,12 +52,12 @@ public:
 		if (!url.query.empty()) req.path += "?" + url.query;
 		req.headers.set("Host", url.host);
 		req.headers.set("Connection", "close");
-		req.headers.set("User-Agent", "Etherz/0.4.0");
+		req.headers.set("User-Agent", "Etherz/0.5.0");
 		return send_request(url, req);
 	}
 
 	/**
-	 * @brief Perform a POST request
+	 * @brief Perform a POST request (auto-detects HTTP/HTTPS)
 	 */
 	Result post(const Url& url, std::string body, std::string_view content_type = "application/json") {
 		HttpRequest req;
@@ -64,7 +65,7 @@ public:
 		req.path = url.path.empty() ? "/" : url.path;
 		req.headers.set("Host", url.host);
 		req.headers.set("Connection", "close");
-		req.headers.set("User-Agent", "Etherz/0.4.0");
+		req.headers.set("User-Agent", "Etherz/0.5.0");
 		req.headers.set("Content-Type", std::string(content_type));
 		req.body = std::move(body);
 		return send_request(url, req);
@@ -72,21 +73,45 @@ public:
 
 	/**
 	 * @brief Send a custom HTTP request
+	 * 
+	 * Automatically uses TLS for https:// URLs.
 	 */
 	Result send_request(const Url& url, const HttpRequest& req) {
-		Result result;
-
-		// Resolve host to IP (simplified: only supports direct IP or localhost)
-		net::Ip<4> ip;
-		if (url.host == "localhost" || url.host == "127.0.0.1") {
-			ip = net::Ip<4>(127, 0, 0, 1);
-		} else {
-			ip = net::Ip<4>{url.host};
+		if (url.scheme == "https") {
+			return send_secure(url, req);
 		}
+		return send_plain(url, req);
+	}
 
-		auto addr = net::SocketAddress<net::Ip<4>>(ip, url.port);
+	/**
+	 * @brief Check if HTTPS is supported
+	 */
+	static constexpr bool supports_https() noexcept {
+#ifdef _WIN32
+		return true;  // SChannel available
+#else
+		return false; // POSIX TLS not yet implemented
+#endif
+	}
 
-		// Connect
+private:
+	/**
+	 * @brief Resolve host to IPv4 (simplified — localhost, 127.0.0.1, or direct IP)
+	 */
+	static net::Ip<4> resolve_host(const Url& url) noexcept {
+		if (url.host == "localhost" || url.host == "127.0.0.1") {
+			return net::Ip<4>(127, 0, 0, 1);
+		}
+		return net::Ip<4>{url.host};
+	}
+
+	/**
+	 * @brief Send over plain HTTP
+	 */
+	Result send_plain(const Url& url, const HttpRequest& req) {
+		Result result;
+		auto addr = net::SocketAddress<net::Ip<4>>(resolve_host(url), url.port);
+
 		net::Socket<net::Ip<4>> sock;
 		result.error = sock.create();
 		if (core::is_error(result.error)) return result;
@@ -94,17 +119,66 @@ public:
 		result.error = sock.connect(addr);
 		if (core::is_error(result.error)) return result;
 
-		// Send
 		auto raw = req.serialize();
 		auto data = std::span<const uint8_t>(
 			reinterpret_cast<const uint8_t*>(raw.data()), raw.size());
 		int sent = sock.send(data);
-		if (sent < 0) {
-			result.error = core::Error::SendFailed;
+		if (sent < 0) { result.error = core::Error::SendFailed; return result; }
+
+		result = receive_response(sock);
+		sock.close();
+		return result;
+	}
+
+	/**
+	 * @brief Send over HTTPS using TlsSocket
+	 */
+	Result send_secure(const Url& url, const HttpRequest& req) {
+		Result result;
+		auto addr = net::SocketAddress<net::Ip<4>>(resolve_host(url), url.port);
+
+		auto tls_ctx = security::TlsContext::client(url.host);
+		security::TlsSocket<net::Ip<4>> tls_sock;
+
+		result.error = tls_sock.create(tls_ctx);
+		if (core::is_error(result.error)) return result;
+
+		result.error = tls_sock.connect(addr);
+		if (core::is_error(result.error)) return result;
+
+		auto raw = req.serialize();
+		auto data = std::span<const uint8_t>(
+			reinterpret_cast<const uint8_t*>(raw.data()), raw.size());
+		int sent = tls_sock.send(data);
+		if (sent < 0) { result.error = core::Error::SendFailed; return result; }
+
+		std::string response_data;
+		std::array<uint8_t, 4096> buffer{};
+		while (true) {
+			int received = tls_sock.recv(buffer);
+			if (received <= 0) break;
+			response_data.append(reinterpret_cast<const char*>(buffer.data()),
+				static_cast<size_t>(received));
+		}
+
+		tls_sock.close();
+
+		if (response_data.empty()) {
+			result.error = core::Error::ReceiveFailed;
 			return result;
 		}
 
-		// Receive
+		result.response = http_parser::parse_response(response_data);
+		result.error = core::Error::None;
+		return result;
+	}
+
+	/**
+	 * @brief Helper: receive and parse HTTP response from a plain socket
+	 */
+	template <typename SocketT>
+	Result receive_response(SocketT& sock) {
+		Result result;
 		std::string response_data;
 		std::array<uint8_t, 4096> buffer{};
 		while (true) {
@@ -113,8 +187,6 @@ public:
 			response_data.append(reinterpret_cast<const char*>(buffer.data()),
 				static_cast<size_t>(received));
 		}
-
-		sock.close();
 
 		if (response_data.empty()) {
 			result.error = core::Error::ReceiveFailed;
@@ -129,3 +201,4 @@ public:
 
 } // namespace protocol
 } // namespace etherz
+

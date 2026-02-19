@@ -13,6 +13,9 @@
 #include "protocol/http_client.hpp"
 #include "protocol/http_server.hpp"
 #include "protocol/websocket.hpp"
+#include "security/tls_context.hpp"
+#include "security/tls_socket.hpp"
+#include "security/certificate.hpp"
 #include "core/error.hpp"
 #include <print>
 #include <windows.h>
@@ -21,6 +24,7 @@ namespace etn = etherz::net;
 namespace etc = etherz::core;
 namespace eta = etherz::async;
 namespace etp = etherz::protocol;
+namespace ets = etherz::security;
 
 /**
  * @brief Initialize console to properly handle UTF-8 output.
@@ -325,6 +329,41 @@ int main() {
 		auto decoded = etp::ws_decode_frame(encoded);
 		decoded.display();
 		std::print("Payload: {}\n", decoded.payload_text());
+	}
+	std::print("\n");
+
+	// ─── TLS Context (v0.5.0) ──────────
+	std::print("── TLS Security (v0.5.0) ─────────\n");
+	{
+		auto ctx = ets::TlsContext::client("example.com");
+		ctx.set_method(ets::TlsMethod::Tls13);
+		ctx.set_verify_mode(ets::TlsVerifyMode::Peer);
+		ctx.display();
+
+		auto server_ctx = ets::TlsContext::server();
+		server_ctx.set_certificate_path("/etc/ssl/cert.pem");
+		server_ctx.display();
+	}
+	std::print("\n");
+
+	// ─── TlsSocket (v0.5.0) ────────────
+	std::print("── TlsSocket (v0.5.0) ────────────\n");
+	{
+		auto ctx = ets::TlsContext::client("localhost");
+		ets::TlsSocket<etn::Ip<4>> tls_sock;
+		auto err = tls_sock.create(ctx);
+		std::print("TLS create     : {}\n", etc::error_message(err));
+		std::print("TLS is_open    : {}\n", tls_sock.is_open());
+		std::print("TLS handshake  : {}\n", tls_sock.handshake_complete());
+		std::print("HTTPS supported: {}\n", etp::HttpClient::supports_https());
+	}
+	std::print("\n");
+
+	// ─── Certificate (v0.5.0) ──────────
+	std::print("── Certificate (v0.5.0) ──────────\n");
+	{
+		auto cert = ets::make_self_signed_info("etherz.local");
+		cert.display();
 	}
 	std::print("\n");
 

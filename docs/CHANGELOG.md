@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.5.0] — 2026-02-19
+
+### Added
+
+- **`etherz::security` namespace** — TLS/SSL security layer
+
+- **`TlsMethod`** / **`TlsVerifyMode`** / **`TlsRole`** enums
+- **`TlsContext`** — TLS configuration (method, verify mode, hostname, cert/key paths)
+  - `TlsContext::client(hostname)` / `TlsContext::server()` factory methods
+
+- **`TlsSocket<T>`** — Encrypted socket wrapper using Windows SChannel (SSPI)
+  - `create(TlsContext&)` — socket + credential acquisition
+  - `connect(addr)` — TCP connect + full TLS handshake loop
+  - `send()` / `recv()` — EncryptMessage / DecryptMessage
+  - RAII lifecycle with move semantics
+
+- **`CertInfo`** — Certificate information struct
+  - `make_self_signed_info()` factory for testing
+
+- **HTTPS support** in `HttpClient` — auto-detects `https://` scheme
+
+### Changed
+
+- `HttpClient::send_request()` routes to `send_plain()` or `send_secure()`
+- `error.hpp` — added `HandshakeFailed`, `CertificateError` error codes
+
+---
+
 ## [0.4.0] — 2026-02-19
 
 ### Added

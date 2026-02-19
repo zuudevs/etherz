@@ -53,6 +53,8 @@ enum class Error : uint8_t {
 	ShutdownFailed,
 	OptionFailed,
 	WouldBlock,
+	HandshakeFailed,
+	CertificateError,
 	Unknown
 };
 
@@ -164,6 +166,8 @@ inline constexpr std::string_view error_message(Error err) noexcept {
 		case Error::ShutdownFailed:      return "Shutdown failed";
 		case Error::OptionFailed:        return "Socket option failed";
 		case Error::WouldBlock:          return "Operation would block";
+		case Error::HandshakeFailed:     return "TLS handshake failed";
+		case Error::CertificateError:    return "Certificate error";
 		case Error::Unknown:             return "Unknown error";
 	}
 	return "Unknown error";

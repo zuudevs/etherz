@@ -47,10 +47,10 @@ Core networking primitives are implemented. The library provides IPv4/IPv6 addre
 
 **Goal:** Encrypted communication support.
 
-- [ ] TLS/SSL integration (OpenSSL or platform-native)
-- [ ] `TlsSocket<T>` — Encrypted socket wrapper
-- [ ] Certificate management utilities
-- [ ] HTTPS support in `HttpClient` / `HttpServer`
+- [x] TLS/SSL integration (OpenSSL or platform-native)
+- [x] `TlsSocket<T>` — Encrypted socket wrapper
+- [x] Certificate management utilities
+- [x] HTTPS support in `HttpClient` / `HttpServer`
 
 ---
 

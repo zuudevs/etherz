@@ -85,6 +85,26 @@ Encoded: 11 bytes
 WsFrame: opcode=Text, fin=true, masked=false, payload_len=9
 Payload: Hello WS!
 
+ΓöÇΓöÇ TLS Security (v0.5.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+TlsContext: method=TLS 1.3, verify=Peer, role=Client, host=example.com
+TlsContext: method=System Default, verify=Peer, role=Server, host=(none)
+
+ΓöÇΓöÇ TlsSocket (v0.5.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+TLS create     : No error
+TLS is_open    : true
+TLS handshake  : false
+HTTPS supported: true
+
+ΓöÇΓöÇ Certificate (v0.5.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+Certificate:
+  Subject    : CN=etherz.local
+  Issuer     : CN=etherz.local
+  Valid from : 2026-01-01T00:00:00Z
+  Valid until: 2027-01-01T00:00:00Z
+  Serial     : 01
+  Fingerprint: AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99
+  Key size   : 2048 bits
+
 ΓöÇΓöÇ Comparison ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
 192.168.1.1 == 192.168.1.2 ? false
 192.168.1.1 <  192.168.1.2 ? true
