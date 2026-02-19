@@ -21,7 +21,17 @@ cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
 
 # Release build
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+# With tests and examples
+cmake -S . -B build -DETHERZ_BUILD_TESTS=ON -DETHERZ_BUILD_EXAMPLES=ON
 ```
+
+### CMake Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `ETHERZ_BUILD_TESTS` | `OFF` | Build unit test suite (`bin/etherz_tests`) |
+| `ETHERZ_BUILD_EXAMPLES` | `OFF` | Build example programs |
 
 ### 2. Build
 

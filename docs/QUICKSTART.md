@@ -7,14 +7,13 @@ Etherz is **header-only** — just add the `include/` directory to your project.
 ### Option 1: Copy Headers
 
 ```bash
-# Copy the include directory into your project
 cp -r etherz/include/ your-project/third-party/etherz/
 ```
 
-Then add to your CMake:
-
 ```cmake
 target_include_directories(your_target PRIVATE "third-party/etherz")
+# Windows only:
+target_link_libraries(your_target PRIVATE ws2_32 secur32 iphlpapi)
 ```
 
 ### Option 2: Git Submodule
@@ -27,158 +26,191 @@ git submodule add https://github.com/zuudevs/etherz.git external/etherz
 target_include_directories(your_target PRIVATE "external/etherz/include")
 ```
 
+### Option 3: CMake find_package
+
+```cmake
+list(APPEND CMAKE_PREFIX_PATH "/path/to/etherz/cmake")
+find_package(etherz REQUIRED)
+target_link_libraries(your_target PRIVATE etherz::etherz)
+```
+
 ---
 
 ## Basic Usage
 
-### IPv4 Addresses
+### IPv4 / IPv6
 
 ```cpp
 #include "net/internet_protocol.hpp"
 namespace etn = etherz::net;
 
-// Construction
-auto ip1 = etn::Ip(192, 168, 1, 1);        // CTAD → Ip<4>
-auto ip2 = etn::Ip<4>{"10.0.0.1"};          // From string
-auto ip3 = etn::Ip<4>(0xC0A80101);           // From uint32_t
+// IPv4
+auto ip = etn::Ip(192, 168, 1, 1);        // CTAD → Ip<4>
+auto ip2 = etn::Ip<4>{"10.0.0.1"};        // From string
+auto next = ip + 1;                         // 192.168.1.2
 
-// Arithmetic
-auto next = ip1 + 1;           // 192.168.1.2
-++ip1;                         // 192.168.1.2
-ip1 += 10;                     // 192.168.1.12
-
-// Comparison
-if (ip1 == ip2) { /* ... */ }
-if (ip1 < ip2) { /* ... */ }
-
-// Network byte order (for socket APIs)
-uint32_t net_order = ip1.to_network();
-
-// Display
-ip1.display();  // → "IPv4: 192.168.1.12"
-```
-
-### IPv6 Addresses
-
-```cpp
-// Full notation
-auto ip6 = etn::Ip<6>(0x2001, 0x0db8, 0, 0, 0, 0, 0, 1);
-
-// String parsing with :: abbreviation
+// IPv6
+auto ip6 = etn::Ip<6>{"2001:db8::1"};
 auto loopback = etn::Ip<6>{"::1"};
-auto link_local = etn::Ip<6>{"fe80::1"};
-auto full = etn::Ip<6>{"2001:0db8:85a3:0000:0000:8a2e:0370:7334"};
-
-// Increment/decrement
-++loopback;  // ::2
-
-loopback.display();  // → "IPv6: 0000:0000:0000:0000:0000:0000:0000:0002"
 ```
 
-### Socket Addresses
-
-```cpp
-#include "net/socket_address.hpp"
-
-// From Ip + port
-auto addr = etn::SocketAddress<etn::Ip<4>>(
-    etn::Ip(127, 0, 0, 1), 8080
-);
-
-// From strings
-auto addr2 = etn::SocketAddress<etn::Ip<4>>("0.0.0.0", "3000");
-
-// Accessors
-auto ip = addr.address();
-auto port = addr.port();
-addr.set_port(9090);
-
-addr.display();  // → "SocketAddress IPv4: 127.0.0.1:9090"
-
-// IPv6 socket address
-auto addr6 = etn::SocketAddress<etn::Ip<6>>(
-    etn::Ip<6>{"::1"}, 443
-);
-addr6.display();  // → "SocketAddress IPv6: [0000:...:0001]:443"
-```
-
-### TCP Endpoints
-
-```cpp
-#include "net/tcp.hpp"
-
-auto tcp = etn::Tcp<etn::Ip<4>>(etn::Ip(10, 0, 0, 1), 80);
-tcp.display();  // → "TCP IPv4: 10.0.0.1:80"
-
-auto tcp6 = etn::Tcp<etn::Ip<6>>(etn::Ip<6>{"::1"}, 443);
-tcp6.display(); // → "TCP IPv6: [0000:...:0001]:443"
-```
-
-### Error Handling
-
-```cpp
-#include "core/error.hpp"
-namespace etc = etherz::core;
-
-auto err = etc::Error::None;
-
-if (etc::is_ok(err)) {
-    // Success path
-}
-
-if (etc::is_error(err)) {
-    std::print("Error: {}\n", etc::error_message(err));
-}
-```
-
-### TCP Socket (Simple Server)
+### TCP Socket (Server)
 
 ```cpp
 #include "net/socket.hpp"
 
-using etn::Socket;
-using etn::SocketAddress;
-using etn::Ip;
+etn::Socket<etn::Ip<4>> server;
+server.create();
+server.bind(etn::SocketAddress<etn::Ip<4>>(etn::Ip(0,0,0,0), 8080));
+server.listen(5);
 
-Socket<Ip<4>> server;
+auto result = server.accept();
+auto client = result.take_client();
 
-// Create socket
-auto err = server.create();
-if (etc::is_error(err)) return 1;
-
-// Bind to 0.0.0.0:8080
-err = server.bind(SocketAddress<Ip<4>>(Ip(0, 0, 0, 0), 8080));
-if (etc::is_error(err)) return 1;
-
-// Listen
-err = server.listen();
-if (etc::is_error(err)) return 1;
-
-// Accept a client
-auto [client, client_addr, accept_err] = server.accept();
-if (etc::is_ok(accept_err)) {
-    client_addr.display();
-
-    // Receive data
-    std::array<uint8_t, 1024> buffer{};
-    int n = client.recv(buffer);
-
-    // Send response
-    std::string_view response = "Hello from Etherz!";
-    client.send({reinterpret_cast<const uint8_t*>(response.data()), response.size()});
-}
+uint8_t buf[1024]{};
+int n = client.recv(std::span<uint8_t>(buf, sizeof(buf)));
+client.send(std::span<const uint8_t>(buf, n));
 // Sockets auto-close on destruction (RAII)
+```
+
+### UDP Socket
+
+```cpp
+#include "net/udp_socket.hpp"
+
+etn::UdpSocket<etn::Ip<4>> udp;
+udp.create();
+udp.bind(etn::SocketAddress<etn::Ip<4>>(etn::Ip(0,0,0,0), 9000));
+
+auto [data, addr, err] = udp.recvfrom(1024);
+udp.sendto(data, addr);
+```
+
+### DNS Resolution
+
+```cpp
+#include "net/dns.hpp"
+
+auto result = etn::Dns::resolve("example.com");
+for (auto& ip : result.ipv4_addresses) ip.display();
+for (auto& ip : result.ipv6_addresses) ip.display();
+
+auto hostname = etn::Dns::reverse(etn::Ip<4>(8, 8, 8, 8));
+```
+
+### Subnet / CIDR
+
+```cpp
+#include "net/subnet.hpp"
+
+auto subnet = etn::Subnet<etn::Ip<4>>::parse("192.168.1.0/24");
+subnet.contains(etn::Ip<4>(192, 168, 1, 50));  // true
+subnet.broadcast().display();                    // 192.168.1.255
+subnet.host_count();                             // 254
+```
+
+### ICMP Ping
+
+```cpp
+#include "net/ping.hpp"
+
+auto result = etn::ping(etn::Ip<4>(127, 0, 0, 1));
+if (result.status == etn::PingStatus::Success) {
+    std::print("rtt={}ms ttl={}\n", result.rtt_ms, result.ttl);
+}
+```
+
+### Network Interfaces
+
+```cpp
+#include "net/network_interface.hpp"
+
+for (auto& iface : etn::list_interfaces()) {
+    std::print("{} — {}\n", iface.name, iface.is_up ? "UP" : "DOWN");
+}
 ```
 
 ---
 
-## Build & Run the Demo
+## HTTP Client
+
+```cpp
+#include "protocol/http_client.hpp"
+namespace etp = etherz::protocol;
+
+// HTTP GET
+auto [resp, err] = etp::HttpClient::get("http://example.com");
+std::print("Status: {}\n", static_cast<int>(resp.status));
+std::print("Body: {}\n", resp.body);
+
+// HTTPS (auto-detected by scheme)
+auto [resp2, err2] = etp::HttpClient::get("https://example.com");
+```
+
+### HTTP Server
+
+```cpp
+#include "protocol/http_server.hpp"
+
+etp::HttpServer server;
+server.route(etp::HttpMethod::Get, "/", [](const auto& req) {
+    etp::HttpResponse resp;
+    resp.body = "<h1>Hello from Etherz!</h1>";
+    resp.headers.set("Content-Type", "text/html");
+    return resp;
+});
+server.listen(etn::SocketAddress<etn::Ip<4>>(etn::Ip(0,0,0,0), 8080));
+```
+
+### WebSocket
+
+```cpp
+#include "protocol/websocket.hpp"
+
+etp::WsFrame frame;
+frame.set_text("Hello WebSocket!");
+auto encoded = etp::ws_encode_frame(frame);
+auto decoded = etp::ws_decode_frame(encoded);
+```
+
+---
+
+## TLS / HTTPS
+
+```cpp
+#include "security/tls_context.hpp"
+#include "security/tls_socket.hpp"
+#include "security/certificate.hpp"
+
+namespace ets = etherz::security;
+
+// TLS Context
+auto ctx = ets::TlsContext::client();
+
+// Self-signed certificate info (for testing)
+auto cert = ets::make_self_signed_info("localhost");
+cert.display();
+```
+
+---
+
+## Build & Run
 
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+# Basic
+cmake -S . -B build && cmake --build build
+./bin/etherz
+
+# With tests and examples
+cmake -S . -B build -DETHERZ_BUILD_TESTS=ON -DETHERZ_BUILD_EXAMPLES=ON
 cmake --build build
-./bin/etherz          # Linux/macOS
-.\bin\etherz.exe      # Windows
+./bin/etherz_tests
+
+# Examples
+./bin/echo_server
+./bin/dns_lookup google.com
+./bin/ping_tool 8.8.8.8
+./bin/subnet_calc 192.168.1.0/24
 ```
 
 See [BUILD.md](../BUILD.md) for more options.
