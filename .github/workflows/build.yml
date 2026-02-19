@@ -36,4 +36,4 @@ jobs:
       run: cmake --build build --config Release
 
     - name: Run Tests
-      run: .\bin\etherz_tests.exe
+      run: .\bin\Release\etherz_tests.exe
