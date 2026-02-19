@@ -5,12 +5,16 @@
 #include "net/udp.hpp"
 #include "net/socket.hpp"
 #include "net/udp_socket.hpp"
+#include "async/poll.hpp"
+#include "async/event_loop.hpp"
+#include "async/async_socket.hpp"
 #include "core/error.hpp"
 #include <print>
 #include <windows.h>
 
 namespace etn = etherz::net;
 namespace etc = etherz::core;
+namespace eta = etherz::async;
 
 /**
  * @brief Initialize console to properly handle UTF-8 output.
@@ -185,6 +189,62 @@ int main() {
 		static_cast<int>(err2), etc::error_message(err2), etc::is_ok(err2));
 	std::print("{}: {} (ok={})\n",
 		static_cast<int>(err3), etc::error_message(err3), etc::is_ok(err3));
+	std::print("\n");
+
+	// ─── Poll (v0.3.0) ─────────────────
+	std::print("── Poll I/O (v0.3.0) ─────────────\n");
+	{
+		etn::Socket<etn::Ip<4>> poll_sock;
+		poll_sock.create();
+		poll_sock.set_nonblocking(true);
+
+		eta::PollEntry entries[1];
+		entries[0].fd = poll_sock.native_handle();
+		entries[0].requested = eta::PollEvent::WriteReady;
+
+		int ready = eta::poll(entries, 0); // non-blocking poll
+		std::print("Polled 1 socket (0ms): {} ready\n", ready);
+		if (ready > 0) {
+			std::print("  WriteReady: {}\n",
+				eta::has_event(entries[0].returned, eta::PollEvent::WriteReady));
+		}
+	}
+	std::print("\n");
+
+	// ─── EventLoop (v0.3.0) ────────────
+	std::print("── EventLoop (v0.3.0) ────────────\n");
+	{
+		eta::EventLoop loop;
+
+		etn::Socket<etn::Ip<4>> ev_sock;
+		ev_sock.create();
+		ev_sock.set_nonblocking(true);
+
+		bool callback_fired = false;
+		loop.add(ev_sock.native_handle(), eta::PollEvent::WriteReady,
+			[&callback_fired, &loop](etn::impl::socket_t fd, eta::PollEvent /*ev*/) {
+				callback_fired = true;
+				loop.remove(fd);
+			});
+
+		std::print("Registered fds : {}\n", loop.size());
+		loop.run_once(0);
+		std::print("Callback fired : {}\n", callback_fired);
+		std::print("Remaining fds  : {}\n", loop.size());
+	}
+	std::print("\n");
+
+	// ─── AsyncSocket (v0.3.0) ──────────
+	std::print("── AsyncSocket (v0.3.0) ──────────\n");
+	{
+		eta::AsyncSocket<etn::Ip<4>> async_sock;
+		auto err = async_sock.create();
+		std::print("Async create   : {}\n", etc::error_message(err));
+		std::print("Async is_open  : {}\n", async_sock.is_open());
+
+		err = async_sock.set_reuse_addr(true);
+		std::print("Async reuse    : {}\n", etc::error_message(err));
+	}
 	std::print("\n");
 
 	// ─── Comparison ─────────────────────

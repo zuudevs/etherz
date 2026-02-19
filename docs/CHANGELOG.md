@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] — 2026-02-19
+
+### Added
+
+- **`etherz::async` namespace** — New async I/O subsystem
+
+- **`PollEvent`** — Bitmask enum: `ReadReady`, `WriteReady`, `Error`, `HangUp`
+  - Bitwise operators (`|`, `&`, `|=`) and `has_event()` helper
+
+- **`PollEntry`** — Struct for poll operations: `fd`, `requested`, `returned`
+
+- **`poll(span<PollEntry>, timeout_ms)`** — Platform-abstracted I/O multiplexing
+  - Uses `WSAPoll` (Windows) / `::poll` (POSIX)
+  - Stack allocation optimization for ≤64 entries
+
+- **`EventLoop`** — Single-threaded event loop
+  - `add(fd, interest, callback)` / `remove(fd)` for socket registration
+  - `run_once(timeout_ms)` — single poll + dispatch cycle
+  - `run()` / `stop()` — continuous loop with graceful shutdown
+  - Callback type: `std::function<void(socket_t, PollEvent)>`
+
+- **`AsyncSocket<T>`** — Callback-based async TCP socket
+  - Auto non-blocking mode on `create()`
+  - `async_connect(addr, loop, callback)` — wait for WriteReady
+  - `async_accept(loop, callback)` — wait for ReadReady, continuous listening
+  - `async_send(data, loop, callback)` / `async_recv(buffer, loop, callback)`
+  - Delegates socket options and lifecycle to underlying `Socket<T>`
+
+---
+
 ## [0.2.0] — 2026-02-19
 
 ### Added

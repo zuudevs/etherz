@@ -23,11 +23,11 @@ Core networking primitives are implemented. The library provides IPv4/IPv6 addre
 
 **Goal:** Non-blocking I/O and event-driven networking.
 
-- [ ] Non-blocking socket mode
-- [ ] `Poll` / `Select` wrapper for I/O multiplexing
-- [ ] `EventLoop` — Single-threaded event loop
-- [ ] Async `connect()`, `accept()`, `send()`, `recv()`
-- [ ] Callback-based or coroutine-based API (evaluate C++23 coroutine support)
+- [x] Non-blocking socket mode
+- [x] `Poll` / `Select` wrapper for I/O multiplexing
+- [x] `EventLoop` — Single-threaded event loop
+- [x] Async `connect()`, `accept()`, `send()`, `recv()`
+- [x] Callback-based or coroutine-based API (evaluate C++23 coroutine support)
 
 ---
 
