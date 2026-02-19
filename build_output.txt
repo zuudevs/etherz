@@ -1,2 +1,5 @@
-[1/2] Building CXX object CMakeFiles\etherz.dir\src\main.cpp.obj
-[2/2] Linking CXX executable D:\playground\programming\etherz\bin\etherz.exe
+[1/5] Linking CXX executable D:\playground\programming\etherz\bin\etherz.exe
+[2/5] Linking CXX executable D:\playground\programming\etherz\bin\ping_tool.exe
+[3/5] Linking CXX executable D:\playground\programming\etherz\bin\etherz_tests.exe
+[4/5] Building CXX object CMakeFiles\echo_server.dir\examples\echo_server.cpp.obj
+[5/5] Linking CXX executable D:\playground\programming\etherz\bin\echo_server.exe

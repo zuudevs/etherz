@@ -1,9 +1,9 @@
 /**
  * @file etherz.hpp
  * @author zuudevs (zuudevs@gmail.com)
- * @brief Brief description
- * @version 0.1.0
- * @date 2026-02-17
+ * @brief Modern C++23 Header-Only Networking Library
+ * @version 1.0.0
+ * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
  */
@@ -14,10 +14,10 @@
 #include <string_view>
 
 namespace etherz {
-inline consteval uint8_t major() noexcept { return 0; }
-inline consteval uint8_t minor() noexcept { return 1; }
+inline consteval uint8_t major() noexcept { return 1; }
+inline consteval uint8_t minor() noexcept { return 0; }
 inline consteval uint8_t patch() noexcept { return 0; }
-inline consteval std::string_view version() noexcept { return "0.1.0"; }
+inline consteval std::string_view version() noexcept { return "1.0.0"; }
 inline consteval std::string_view author() noexcept { return "zuudevs"; }
 inline consteval std::string_view email() noexcept { return "zuudevs@gmail.com"; }
 inline consteval std::string_view github() noexcept { return "https://github.com/zuudevs"; }

@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 #include <print>
 
 #include "internet_protocol.hpp"

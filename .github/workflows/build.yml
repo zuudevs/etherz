@@ -1,0 +1,39 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        compiler: [msvc, clang]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSVC
+      if: matrix.compiler == 'msvc'
+      uses: ilammy/msvc-dev-cmd@v1
+
+    - name: Setup Clang
+      if: matrix.compiler == 'clang'
+      run: choco install llvm -y
+
+    - name: Configure (MSVC)
+      if: matrix.compiler == 'msvc'
+      run: cmake -B build -DETHERZ_BUILD_TESTS=ON -DETHERZ_BUILD_EXAMPLES=ON
+
+    - name: Configure (Clang)
+      if: matrix.compiler == 'clang'
+      run: cmake -B build -DETHERZ_BUILD_TESTS=ON -DETHERZ_BUILD_EXAMPLES=ON -T ClangCL
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Run Tests
+      run: .\bin\etherz_tests.exe

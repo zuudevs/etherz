@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0] — 2026-02-19
+
+### Added
+
+- **Unit Test Suite** — 28 test cases, 103 assertions across IP, subnet, URL, HTTP, WebSocket, and certificate modules
+  - Lightweight header-only test framework (`test_framework.hpp`)
+  - Tests: `test_ip`, `test_subnet`, `test_url`, `test_http`, `test_websocket`, `test_certificate`
+- **Example Programs** — Echo server, DNS lookup, ping tool, subnet calculator
+- **CI/CD** — GitHub Actions workflow (Windows MSVC + Clang)
+- **Documentation** — Doxygen config, API reference (`docs/API.md`)
+- **Package Support** — CMake `find_package` config (`cmake/etherz-config.cmake`)
+- **CMake Options** — `ETHERZ_BUILD_TESTS`, `ETHERZ_BUILD_EXAMPLES`
+
+### Changed
+
+- Version bumped to 1.0.0 in `etherz.hpp`
+- README updated with full feature list and build instructions
+- API stability guarantee
+
+### Fixed
+
+- Missing `<span>` include in `websocket.hpp`
+- Missing `<vector>` include in `ping.hpp`
+
 ## [0.6.0] — 2026-02-19
 
 ### Added

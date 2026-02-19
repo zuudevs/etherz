@@ -1,140 +1,71 @@
 ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
-  Etherz v0.1.0 by zuudevs
+  Etherz Test Suite
 ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
 
-ΓöÇΓöÇ IPv4 ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-IPv4: 192.168.1.50
-IPv4: 10.0.0.1
-IPv4: 192.168.1.1
-192.168.1.1 + 5 = IPv4: 192.168.1.6
-After ++     = IPv4: 192.168.1.7
-Network order of 192.168.1.1: 0x0101A8C0
+ΓöÇΓöÇ ipv4_default_constructor ΓöÇΓöÇ
 
-ΓöÇΓöÇ IPv6 ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-IPv6: 2001:0db8:0000:0000:0000:0000:0000:0001
-IPv6: 2001:0db8:0000:0000:0000:0000:0000:0001
-IPv6: fe80:0000:0000:0000:0000:0000:0000:0001
-IPv6: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-After ++ fe80::1 = IPv6: fe80:0000:0000:0000:0000:0000:0000:0002
+ΓöÇΓöÇ ipv4_octet_constructor ΓöÇΓöÇ
 
-ΓöÇΓöÇ SocketAddress ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-SocketAddress IPv4: 127.0.0.1:8080
-SocketAddress IPv4: 192.168.1.100:443
-SocketAddress IPv4: 0.0.0.0:3000
-SocketAddress IPv6: [0000:0000:0000:0000:0000:0000:0000:0001]:8080
+ΓöÇΓöÇ ipv4_string_parse ΓöÇΓöÇ
 
-ΓöÇΓöÇ TCP Endpoints ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-TCP IPv4: 10.0.0.1:80
-TCP IPv6: [0000:0000:0000:0000:0000:0000:0000:0001]:443
+ΓöÇΓöÇ ipv4_to_uint32 ΓöÇΓöÇ
 
-ΓöÇΓöÇ UDP Endpoints ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-UDP IPv4: 8.8.8.8:53
-UDP IPv6: [0000:0000:0000:0000:0000:0000:0000:0001]:5353
+ΓöÇΓöÇ ipv4_arithmetic ΓöÇΓöÇ
 
-ΓöÇΓöÇ Socket Options (v0.2.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-create : No error
-reuse  : No error
-nonblk : No error
-timeout: No error
-shutdn : Not connected (expected: not connected)
+ΓöÇΓöÇ ipv4_comparison ΓöÇΓöÇ
 
-ΓöÇΓöÇ IPv6 Socket (v0.2.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-IPv6 socket create: No error
-IPv6 socket open  : true
+ΓöÇΓöÇ ipv6_default_constructor ΓöÇΓöÇ
 
-ΓöÇΓöÇ UdpSocket (v0.2.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-UDP create : No error
-UDP reuse  : No error
-UDP open   : true
+ΓöÇΓöÇ ipv6_group_constructor ΓöÇΓöÇ
 
-ΓöÇΓöÇ Error Types & Mapping ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-0: No error (ok=true)
-8: Connection refused (ok=false)
-22: Operation would block (ok=false)
+ΓöÇΓöÇ ipv6_comparison ΓöÇΓöÇ
 
-ΓöÇΓöÇ Poll I/O (v0.3.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-Polled 1 socket (0ms): 0 ready
+ΓöÇΓöÇ subnet_parse_cidr ΓöÇΓöÇ
 
-ΓöÇΓöÇ EventLoop (v0.3.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-Registered fds : 1
-Callback fired : false
-Remaining fds  : 1
+ΓöÇΓöÇ subnet_mask ΓöÇΓöÇ
 
-ΓöÇΓöÇ AsyncSocket (v0.3.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-Async create   : No error
-Async is_open  : true
-Async reuse    : No error
+ΓöÇΓöÇ subnet_contains ΓöÇΓöÇ
 
-ΓöÇΓöÇ URL Parsing (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-URL: scheme=http, host=example.com, port=8080, path=/api/v1, query=key=val, fragment=section
-URL: scheme=https, host=localhost, port=443, path=/index.html, query=, fragment=
-Reconstructed: https://localhost/index.html
+ΓöÇΓöÇ subnet_broadcast ΓöÇΓöÇ
 
-ΓöÇΓöÇ HTTP Core (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-HTTP Request: POST /api/data HTTP/1.1
-Serialized (113 bytes)
-HTTP Response: HTTP/1.1 200 OK
-Body: <h1>Hello</h1>
+ΓöÇΓöÇ subnet_host_count ΓöÇΓöÇ
 
-ΓöÇΓöÇ HttpServer (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-Routes registered: 2
+ΓöÇΓöÇ subnet_to_string ΓöÇΓöÇ
 
-ΓöÇΓöÇ WebSocket (v0.4.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-WsFrame: opcode=Text, fin=true, masked=false, payload_len=9
-Encoded: 11 bytes
-WsFrame: opcode=Text, fin=true, masked=false, payload_len=9
-Payload: Hello WS!
+ΓöÇΓöÇ url_parse_full ΓöÇΓöÇ
 
-ΓöÇΓöÇ TLS Security (v0.5.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-TlsContext: method=TLS 1.3, verify=Peer, role=Client, host=example.com
-TlsContext: method=System Default, verify=Peer, role=Server, host=(none)
+ΓöÇΓöÇ url_parse_https_default_port ΓöÇΓöÇ
 
-ΓöÇΓöÇ TlsSocket (v0.5.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-TLS create     : No error
-TLS is_open    : true
-TLS handshake  : false
-HTTPS supported: true
+ΓöÇΓöÇ url_parse_http_default_port ΓöÇΓöÇ
 
-ΓöÇΓöÇ Certificate (v0.5.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-Certificate:
-  Subject    : CN=etherz.local
-  Issuer     : CN=etherz.local
-  Valid from : 2026-01-01T00:00:00Z
-  Valid until: 2027-01-01T00:00:00Z
-  Serial     : 01
-  Fingerprint: AA:BB:CC:DD:EE:FF:00:11:22:33:44:55:66:77:88:99
-  Key size   : 2048 bits
+ΓöÇΓöÇ url_to_string ΓöÇΓöÇ
 
-ΓöÇΓöÇ DNS Resolution (v0.6.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-resolve('localhost'): 2 address(es)
-  IPv4: IPv4: 127.0.0.1
-  IPv6: IPv6: 0000:0000:0000:0000:0000:0000:0000:0001
-reverse(127.0.0.1) : Rafi-Indra
+ΓöÇΓöÇ http_method_to_string ΓöÇΓöÇ
 
-ΓöÇΓöÇ Subnet / CIDR (v0.6.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-Subnet: 192.168.1.0/24 (mask=IPv4: 255.255.255.0
-, hosts=254)
-contains 192.168.1.100 ? true
-contains 10.0.0.1      ? false
-CIDR: 192.168.1.0/24
-Broadcast: IPv4: 192.168.1.255
+ΓöÇΓöÇ http_status_to_string ΓöÇΓöÇ
 
-ΓöÇΓöÇ Network Interfaces (v0.6.0) ΓöÇΓöÇΓöÇ
-Found 5 interface(s)
-  vEthernet (WSL (Hyper-V firewall)) [00:15:5D:2C:64:82] UP 172.22.112.1
-  Local Area Connection* 11 [F4:B3:01:F9:98:87] DOWN 169.254.77.183
-  Local Area Connection* 12 [F6:B3:01:F9:98:86] DOWN 169.254.3.234
-  Wi-Fi [F4:B3:01:F9:98:86] UP 192.168.1.30
-  Loopback Pseudo-Interface 1 [00:00:00:00:00:00] UP (lo) 127.0.0.1
+ΓöÇΓöÇ http_headers_case_insensitive ΓöÇΓöÇ
 
-ΓöÇΓöÇ Ping / ICMP (v0.6.0) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-ping 127.0.0.1: Ping: status=Success, rtt=0ms, ttl=128, bytes=12
+ΓöÇΓöÇ http_request_serialize ΓöÇΓöÇ
 
-ΓöÇΓöÇ Comparison ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
-192.168.1.1 == 192.168.1.2 ? false
-192.168.1.1 <  192.168.1.2 ? true
-192.168.1.1 == 192.168.1.1 ? true
+ΓöÇΓöÇ http_response_parse ΓöÇΓöÇ
+
+ΓöÇΓöÇ http_request_parse ΓöÇΓöÇ
+
+ΓöÇΓöÇ ws_frame_text ΓöÇΓöÇ
+
+ΓöÇΓöÇ ws_encode_decode_roundtrip ΓöÇΓöÇ
+
+ΓöÇΓöÇ ws_binary_frame ΓöÇΓöÇ
+
+ΓöÇΓöÇ ws_encode_size ΓöÇΓöÇ
+
+ΓöÇΓöÇ cert_self_signed ΓöÇΓöÇ
+
+ΓöÇΓöÇ cert_custom_key_bits ΓöÇΓöÇ
+
+ΓöÇΓöÇ cert_empty_invalid ΓöÇΓöÇ
 
 ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
-  All demos completed successfully!
+  Results: 103 passed, 0 failed
 ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ

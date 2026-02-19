@@ -1,0 +1,30 @@
+# Etherz Doxyfile
+# Generate with: doxygen docs/Doxyfile
+
+PROJECT_NAME           = "Etherz"
+PROJECT_NUMBER         = "1.0.0"
+PROJECT_BRIEF          = "Modern C++23 Header-Only Networking Library"
+
+OUTPUT_DIRECTORY       = docs/api
+INPUT                  = include
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp
+
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+HTML_COLORSTYLE        = LIGHT
+
+HAVE_DOT               = NO
+CLASS_DIAGRAMS          = YES
+COLLABORATION_GRAPH     = NO
+
+SORT_BRIEF_DOCS        = YES
+SORT_MEMBERS_CTORS_1ST = YES
+
+WARN_IF_UNDOCUMENTED   = NO
+QUIET                  = YES

@@ -15,6 +15,7 @@
 #include <string_view>
 #include <vector>
 #include <array>
+#include <span>
 #include <print>
 
 namespace etherz {

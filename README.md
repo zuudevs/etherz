@@ -7,7 +7,8 @@
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-23-blue?style=flat-square&logo=cplusplus)](https://isocpp.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE.md)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)]()
-[![Version](https://img.shields.io/badge/Version-0.1.0-orange?style=flat-square)]()
+[![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square)]()
+[![Build](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)]()
 
 *A lightweight, type-safe, and modern networking library built with C++23 features.*
 
@@ -18,13 +19,17 @@
 ## ✨ Features
 
 - **IPv4 & IPv6** — Full IP address representation with parsing, arithmetic, and comparison
-- **Socket Addresses** — Type-safe `SocketAddress<Ip<4>>` and `SocketAddress<Ip<6>>`
-- **TCP Endpoints** — Clean `Tcp<Ip<4>>` and `Tcp<Ip<6>>` endpoint structs
-- **RAII Sockets** — Platform-aware TCP socket wrapper with automatic cleanup
-- **Error Handling** — Comprehensive error enum with human-readable messages
+- **TCP & UDP Sockets** — RAII socket wrappers with platform abstraction
+- **Async I/O** — Poll, event loop, and async socket operations
+- **HTTP/1.1** — Client (GET/POST + HTTPS), server with routing, request/response parsing
+- **WebSocket** — Frame encode/decode, handshake helpers
+- **TLS/SSL** — SChannel-based `TlsSocket<T>` wrapper with certificate management
+- **DNS** — Hostname resolution, reverse lookup, IPv4/IPv6
+- **Network Interfaces** — Enumerate local NICs with MAC, IP, status
+- **Subnet/CIDR** — Parse, contains, mask, broadcast, host counting
+- **ICMP Ping** — Lightweight ping utility
 - **Header-Only** — Just `#include` and go, no linking required
 - **Modern C++23** — Uses concepts, `<=>` operator, `std::print`, `constexpr`, CTAD, and more
-- **Cross-Platform** — Windows (WinSock2) and POSIX (Linux/macOS) socket support
 
 ## 📋 Requirements
 
@@ -38,28 +43,32 @@
 
 ```cpp
 #include "net/internet_protocol.hpp"
-#include "net/socket_address.hpp"
-#include "net/tcp.hpp"
+#include "net/dns.hpp"
+#include "net/subnet.hpp"
+#include "protocol/http_client.hpp"
 
 namespace etn = etherz::net;
+namespace etp = etherz::protocol;
 
 int main() {
     // IPv4
     auto ip = etn::Ip(192, 168, 1, 1);
-    auto ip_parsed = etn::Ip<4>{"10.0.0.1"};
     ip.display();  // IPv4: 192.168.1.1
 
-    // IPv6 with :: abbreviation
-    auto ip6 = etn::Ip<6>{"2001:db8::1"};
-    ip6.display(); // IPv6: 2001:0db8:0000:0000:0000:0000:0000:0001
+    // DNS
+    auto dns = etn::Dns::resolve("localhost");
+    // → 127.0.0.1 + ::1
 
-    // Socket Address
-    auto addr = etn::SocketAddress<etn::Ip<4>>(ip, 8080);
-    addr.display(); // SocketAddress IPv4: 192.168.1.1:8080
+    // Subnet
+    auto subnet = etn::Subnet<etn::Ip<4>>::parse("192.168.1.0/24");
+    subnet.contains(ip);  // true
 
-    // TCP Endpoint
-    auto tcp = etn::Tcp<etn::Ip<4>>(ip, 80);
-    tcp.display(); // TCP IPv4: 192.168.1.1:80
+    // HTTP GET
+    auto [resp, err] = etp::HttpClient::get("http://example.com");
+
+    // Ping
+    auto result = etn::ping(etn::Ip<4>(127, 0, 0, 1));
+    // → rtt=0ms, ttl=128
 
     return 0;
 }
@@ -68,9 +77,14 @@ int main() {
 ## 🏗️ Build
 
 ```bash
+# Basic build
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 cmake --build build
-./bin/etherz     # or .\bin\etherz.exe on Windows
+
+# With tests and examples
+cmake -S . -B build -DETHERZ_BUILD_TESTS=ON -DETHERZ_BUILD_EXAMPLES=ON
+cmake --build build
+./bin/etherz_tests     # Run unit tests
 ```
 
 See [BUILD.md](BUILD.md) for detailed build instructions.
@@ -79,9 +93,7 @@ See [BUILD.md](BUILD.md) for detailed build instructions.
 
 | Document | Description |
 |----------|-------------|
-| [QUICKSTART.md](docs/QUICKSTART.md) | Getting started guide with examples |
 | [API.md](docs/API.md) | Complete API reference |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Design patterns and architecture overview |
 | [ROADMAP.md](docs/ROADMAP.md) | Future plans and milestones |
 | [CHANGELOG.md](docs/CHANGELOG.md) | Version history |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
@@ -94,16 +106,35 @@ etherz/
 │   ├── etherz.hpp                  # Library metadata (version, author)
 │   ├── core/
 │   │   └── error.hpp               # Error types and utilities
-│   └── net/
-│       ├── internet_protocol.hpp   # Ip<4> and Ip<6> classes
-│       ├── socket_address.hpp      # SocketAddress<T> templates
-│       ├── tcp.hpp                 # Tcp<T> endpoint structs
-│       └── socket.hpp              # RAII Socket<T> wrapper
-├── src/
-│   └── main.cpp                    # Demo application
+│   ├── net/
+│   │   ├── internet_protocol.hpp   # Ip<4> and Ip<6> classes
+│   │   ├── socket_address.hpp      # SocketAddress<T> templates
+│   │   ├── tcp.hpp / udp.hpp       # Endpoint structs
+│   │   ├── socket.hpp              # RAII Socket<T> wrapper
+│   │   ├── udp_socket.hpp          # UDP socket
+│   │   ├── dns.hpp                 # DNS resolution
+│   │   ├── subnet.hpp              # Subnet/CIDR utilities
+│   │   ├── network_interface.hpp   # NIC enumeration
+│   │   └── ping.hpp                # ICMP ping
+│   ├── async/
+│   │   ├── poll.hpp                # Platform poll wrapper
+│   │   ├── event_loop.hpp          # Callback event loop
+│   │   └── async_socket.hpp        # Async socket ops
+│   ├── protocol/
+│   │   ├── url.hpp                 # URL parser
+│   │   ├── http.hpp                # HTTP request/response
+│   │   ├── http_client.hpp         # HTTP + HTTPS client
+│   │   ├── http_server.hpp         # HTTP server with routing
+│   │   └── websocket.hpp           # WebSocket frames
+│   └── security/
+│       ├── tls_context.hpp         # TLS configuration
+│       ├── tls_socket.hpp          # SChannel TLS wrapper
+│       └── certificate.hpp         # X.509 certificate info
+├── src/main.cpp                    # Demo application
+├── tests/                          # Unit test suite
+├── examples/                       # Example programs
 ├── docs/                           # Documentation
-├── tests/                          # Unit tests (planned)
-├── examples/                       # Example programs (planned)
+├── cmake/                          # Package config
 └── CMakeLists.txt                  # Build configuration
 ```
 
