@@ -33,7 +33,8 @@
 - `Socket<Ip<V>>` — TCP socket (create, bind, listen, accept, connect, send, recv)
 
 ### `udp_socket.hpp`
-- `UdpSocket<Ip<V>>` — UDP socket (sendto, recvfrom)
+- `UdpSocket<Ip<4>>` — UDP IPv4 socket (sendto, recvfrom)
+- `UdpSocket<Ip<6>>` — UDP IPv6 socket (sendto, recvfrom)
 
 ### `dns.hpp`
 - `Dns::resolve(hostname)` → `DnsResult` (IPv4 + IPv6)
@@ -54,10 +55,10 @@
 ## Async (`async/`)
 
 ### `poll.hpp`
-- `Poll` — Platform poll wrapper (add, remove, wait)
+- `poll()` — Platform poll wrapper (`WSAPoll` / `::poll`) with `native_pollfd` abstraction
 
 ### `event_loop.hpp`
-- `EventLoop` — Callback-driven event loop
+- `EventLoop` — Callback-driven event loop with snapshot-based dispatch
 
 ### `async_socket.hpp`
 - `AsyncSocket` — Non-blocking socket with async ops
@@ -74,10 +75,10 @@
 - `HttpHeaders` — Case-insensitive header map
 
 ### `http_client.hpp`
-- `HttpClient::get(url)` / `post(url, body)` — HTTP + HTTPS
+- `HttpClient::get(url)` / `post(url, body)` — HTTP + HTTPS (DNS-resolved hostnames)
 
 ### `http_server.hpp`
-- `HttpServer` — Routing-based HTTP server
+- `HttpServer` — Routing-based HTTP server (multi-read request handling)
 
 ### `websocket.hpp`
 - `WsFrame` — Frame encode/decode
@@ -90,7 +91,7 @@
 - `TlsContext` — TLS configuration (method, verify mode, role)
 
 ### `tls_socket.hpp`
-- `TlsSocket<T>` — Encrypted socket wrapper (SChannel)
+- `TlsSocket<T>` — Encrypted socket wrapper (SChannel) with partial record handling
 
 ### `certificate.hpp`
 - `CertInfo` — Certificate information struct

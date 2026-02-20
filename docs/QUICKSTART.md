@@ -78,12 +78,21 @@ client.send(std::span<const uint8_t>(buf, n));
 ```cpp
 #include "net/udp_socket.hpp"
 
+// IPv4 UDP
 etn::UdpSocket<etn::Ip<4>> udp;
 udp.create();
 udp.bind(etn::SocketAddress<etn::Ip<4>>(etn::Ip(0,0,0,0), 9000));
 
-auto [data, addr, err] = udp.recvfrom(1024);
-udp.sendto(data, addr);
+uint8_t buf[1024]{};
+auto result = udp.recv_from(std::span<uint8_t>(buf, sizeof(buf)));
+if (result.bytes > 0) {
+    udp.send_to(std::span<const uint8_t>(buf, result.bytes), result.sender);
+}
+
+// IPv6 UDP
+etn::UdpSocket<etn::Ip<6>> udp6;
+udp6.create();
+udp6.bind(etn::SocketAddress<etn::Ip<6>>(etn::Ip<6>{"::"}, 9000));
 ```
 
 ### DNS Resolution
@@ -138,13 +147,21 @@ for (auto& iface : etn::list_interfaces()) {
 #include "protocol/http_client.hpp"
 namespace etp = etherz::protocol;
 
-// HTTP GET
-auto [resp, err] = etp::HttpClient::get("http://example.com");
-std::print("Status: {}\n", static_cast<int>(resp.status));
-std::print("Body: {}\n", resp.body);
+etp::HttpClient client;
+
+// HTTP GET — hostnames are automatically DNS-resolved
+auto url = etp::Url::parse("http://example.com");
+auto result = client.get(url);
+std::print("Status: {}\n", static_cast<int>(result.response.status));
+std::print("Body: {}\n", result.response.body);
 
 // HTTPS (auto-detected by scheme)
-auto [resp2, err2] = etp::HttpClient::get("https://example.com");
+auto url2 = etp::Url::parse("https://example.com");
+auto result2 = client.get(url2);
+
+// POST with body (Content-Length auto-included)
+auto url3 = etp::Url::parse("http://api.example.com/data");
+auto result3 = client.post(url3, R"({"key":"value"})");
 ```
 
 ### HTTP Server

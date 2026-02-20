@@ -7,7 +7,7 @@
 [![C++ Standard](https://img.shields.io/badge/C%2B%2B-23-blue?style=flat-square&logo=cplusplus)](https://isocpp.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE.md)
 [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey?style=flat-square)]()
-[![Version](https://img.shields.io/badge/Version-1.0.0-orange?style=flat-square)]()
+[![Version](https://img.shields.io/badge/Version-1.0.1-orange?style=flat-square)]()
 [![Build](https://img.shields.io/badge/Build-Passing-brightgreen?style=flat-square)]()
 
 *A lightweight, type-safe, and modern networking library built with C++23 features.*
@@ -94,9 +94,12 @@ See [BUILD.md](BUILD.md) for detailed build instructions.
 | Document | Description |
 |----------|-------------|
 | [API.md](docs/API.md) | Complete API reference |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Architecture overview with diagrams |
+| [QUICKSTART.md](docs/QUICKSTART.md) | Quick start guide with examples |
 | [ROADMAP.md](docs/ROADMAP.md) | Future plans and milestones |
 | [CHANGELOG.md](docs/CHANGELOG.md) | Version history |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
+| [SECURITY.md](SECURITY.md) | Security policy |
 
 ## 📁 Project Structure
 

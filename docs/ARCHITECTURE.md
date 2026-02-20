@@ -107,6 +107,7 @@ graph LR
         SOCK --> TLS_SOCK
         TLS_CTX --> TLS_SOCK
         TLS_SOCK --> HC
+        DNS --> HC
         CERT --> TLS_SOCK
     end
 
@@ -428,6 +429,7 @@ All OS handles are managed with RAII:
 | Class | Resource | Acquire | Release |
 |-------|----------|---------|---------|
 | `Socket` | socket fd | `::socket()` | `closesocket()` / `close()` |
+| `UdpSocket` | socket fd | `::socket()` | `closesocket()` / `close()` |
 | `WsaGuard` | WinSock | `WSAStartup()` | `WSACleanup()` |
 | `CredentialGuard` | SSPI creds | `AcquireCredentialsHandle()` | `FreeCredentialsHandle()` |
 | `ContextGuard` | Security ctx | `InitializeSecurityContext()` | `DeleteSecurityContext()` |
