@@ -78,12 +78,10 @@ public:
 		if (!listening_) return core::Error::SocketClosed;
 
 		auto accept_result = listener_.accept();
-		if (core::is_error(accept_result.error)) return accept_result.error;
+		if (!accept_result) return accept_result.error();
 
-		// Wrap the accepted fd into a Socket
-		net::Socket<net::Ip<4>> client;
-		// Move the fd manually (using take_client pattern)
-		auto client_sock = accept_result.take_client();
+		// Move the socket from the result
+		auto client_sock = std::move(accept_result->socket);
 
 		// Receive request (loop until headers are complete)
 		std::string request_data;

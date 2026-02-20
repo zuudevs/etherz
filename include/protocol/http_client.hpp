@@ -15,6 +15,7 @@
 #include <string_view>
 #include <vector>
 #include <print>
+#include <expected>
 
 #include "url.hpp"
 #include "http.hpp"
@@ -36,17 +37,9 @@ namespace protocol {
 class HttpClient {
 public:
 	/**
-	 * @brief Result of an HTTP operation
-	 */
-	struct Result {
-		HttpResponse response;
-		core::Error  error = core::Error::None;
-	};
-
-	/**
 	 * @brief Perform a GET request (auto-detects HTTP/HTTPS)
 	 */
-	Result get(const Url& url) {
+	std::expected<HttpResponse, core::Error> get(const Url& url) {
 		HttpRequest req;
 		req.method = HttpMethod::Get;
 		req.path = url.path.empty() ? "/" : url.path;
@@ -60,7 +53,7 @@ public:
 	/**
 	 * @brief Perform a POST request (auto-detects HTTP/HTTPS)
 	 */
-	Result post(const Url& url, std::string body, std::string_view content_type = "application/json") {
+	std::expected<HttpResponse, core::Error> post(const Url& url, std::string body, std::string_view content_type = "application/json") {
 		HttpRequest req;
 		req.method = HttpMethod::Post;
 		req.path = url.path.empty() ? "/" : url.path;
@@ -78,7 +71,7 @@ public:
 	 * 
 	 * Automatically uses TLS for https:// URLs.
 	 */
-	Result send_request(const Url& url, const HttpRequest& req) {
+	std::expected<HttpResponse, core::Error> send_request(const Url& url, const HttpRequest& req) {
 		if (url.scheme == "https") {
 			return send_secure(url, req);
 		}
@@ -99,9 +92,6 @@ public:
 private:
 	/**
 	 * @brief Resolve host to IPv4 via DNS
-	 * 
-	 * Uses Dns::resolve() for hostname lookup, with fallback to
-	 * direct IP string parsing for dotted-decimal addresses.
 	 */
 	static net::Ip<4> resolve_host(const Url& url) noexcept {
 		if (url.host == "localhost" || url.host == "127.0.0.1") {
@@ -121,49 +111,43 @@ private:
 	/**
 	 * @brief Send over plain HTTP
 	 */
-	Result send_plain(const Url& url, const HttpRequest& req) {
-		Result result;
+	std::expected<HttpResponse, core::Error> send_plain(const Url& url, const HttpRequest& req) {
 		auto addr = net::SocketAddress<net::Ip<4>>(resolve_host(url), url.port);
 
 		net::Socket<net::Ip<4>> sock;
-		result.error = sock.create();
-		if (core::is_error(result.error)) return result;
+		if (auto err = sock.create(); core::is_error(err)) return std::unexpected(err);
 
-		result.error = sock.connect(addr);
-		if (core::is_error(result.error)) return result;
+		if (auto err = sock.connect(addr); core::is_error(err)) return std::unexpected(err);
 
 		auto raw = req.serialize();
 		auto data = std::span<const uint8_t>(
 			reinterpret_cast<const uint8_t*>(raw.data()), raw.size());
 		int sent = sock.send(data);
-		if (sent < 0) { result.error = core::Error::SendFailed; return result; }
+		if (sent < 0) return std::unexpected(core::Error::SendFailed);
 
-		result = receive_response(sock);
+		auto res = receive_response(sock);
 		sock.close();
-		return result;
+		return res;
 	}
 
 	/**
 	 * @brief Send over HTTPS using TlsSocket
 	 */
-	Result send_secure(const Url& url, const HttpRequest& req) {
-		Result result;
+	std::expected<HttpResponse, core::Error> send_secure(const Url& url, const HttpRequest& req) {
 		auto addr = net::SocketAddress<net::Ip<4>>(resolve_host(url), url.port);
 
 		auto tls_ctx = security::TlsContext::client(url.host);
 		security::TlsSocket<net::Ip<4>> tls_sock;
 
-		result.error = tls_sock.create(tls_ctx);
-		if (core::is_error(result.error)) return result;
+		if (auto err = tls_sock.create(tls_ctx); core::is_error(err)) return std::unexpected(err);
 
-		result.error = tls_sock.connect(addr);
-		if (core::is_error(result.error)) return result;
+		if (auto err = tls_sock.connect(addr); core::is_error(err)) return std::unexpected(err);
 
 		auto raw = req.serialize();
 		auto data = std::span<const uint8_t>(
 			reinterpret_cast<const uint8_t*>(raw.data()), raw.size());
 		int sent = tls_sock.send(data);
-		if (sent < 0) { result.error = core::Error::SendFailed; return result; }
+		if (sent < 0) return std::unexpected(core::Error::SendFailed);
 
 		std::string response_data;
 		std::array<uint8_t, 4096> buffer{};
@@ -177,21 +161,17 @@ private:
 		tls_sock.close();
 
 		if (response_data.empty()) {
-			result.error = core::Error::ReceiveFailed;
-			return result;
+			return std::unexpected(core::Error::ReceiveFailed);
 		}
 
-		result.response = http_parser::parse_response(response_data);
-		result.error = core::Error::None;
-		return result;
+		return http_parser::parse_response(response_data);
 	}
 
 	/**
 	 * @brief Helper: receive and parse HTTP response from a plain socket
 	 */
 	template <typename SocketT>
-	Result receive_response(SocketT& sock) {
-		Result result;
+	std::expected<HttpResponse, core::Error> receive_response(SocketT& sock) {
 		std::string response_data;
 		std::array<uint8_t, 4096> buffer{};
 		while (true) {
@@ -202,13 +182,10 @@ private:
 		}
 
 		if (response_data.empty()) {
-			result.error = core::Error::ReceiveFailed;
-			return result;
+			return std::unexpected(core::Error::ReceiveFailed);
 		}
 
-		result.response = http_parser::parse_response(response_data);
-		result.error = core::Error::None;
-		return result;
+		return http_parser::parse_response(response_data);
 	}
 };
 

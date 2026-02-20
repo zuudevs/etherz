@@ -46,6 +46,7 @@
 #include "net/dns.hpp"
 #include "net/subnet.hpp"
 #include "protocol/http_client.hpp"
+#include <print>
 
 namespace etn = etherz::net;
 namespace etp = etherz::protocol;
@@ -53,7 +54,7 @@ namespace etp = etherz::protocol;
 int main() {
     // IPv4
     auto ip = etn::Ip(192, 168, 1, 1);
-    ip.display();  // IPv4: 192.168.1.1
+    std::print("IPv4: {}\n", ip);  // IPv4: 192.168.1.1
 
     // DNS
     auto dns = etn::Dns::resolve("localhost");
@@ -61,10 +62,14 @@ int main() {
 
     // Subnet
     auto subnet = etn::Subnet<etn::Ip<4>>::parse("192.168.1.0/24");
-    subnet.contains(ip);  // true
+    std::print("Contains: {}\n", subnet.contains(ip));  // true
 
     // HTTP GET
-    auto [resp, err] = etp::HttpClient::get("http://example.com");
+    if (auto res = etp::HttpClient::get("http://example.com")) {
+        std::print("Status: {}\n", static_cast<int>(res->status));
+    } else {
+        std::print("Error: {}\n", res.error());
+    }
 
     // Ping
     auto result = etn::ping(etn::Ip<4>(127, 0, 0, 1));

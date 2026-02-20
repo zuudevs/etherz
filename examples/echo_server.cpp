@@ -66,12 +66,12 @@ int main(int argc, char* argv[]) {
 	// Accept loop
 	while (true) {
 		auto accept_result = server.accept();
-		if (accept_result.error != etherz::core::Error::None) {
-			std::print("Accept failed: {}\n", etherz::core::error_message(accept_result.error));
+		if (!accept_result) {
+			std::print("Accept failed: {}\n", accept_result.error());
 			continue;
 		}
 
-		auto client = accept_result.take_client();
+		auto client = std::move(accept_result->socket);
 		std::print("Client connected!\n");
 
 		// Echo loop

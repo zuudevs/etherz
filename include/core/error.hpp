@@ -55,6 +55,7 @@ enum class Error : uint8_t {
 	WouldBlock,
 	HandshakeFailed,
 	CertificateError,
+	FeatureNotSupported,
 	Unknown
 };
 
@@ -168,6 +169,7 @@ inline constexpr std::string_view error_message(Error err) noexcept {
 		case Error::WouldBlock:          return "Operation would block";
 		case Error::HandshakeFailed:     return "TLS handshake failed";
 		case Error::CertificateError:    return "Certificate error";
+		case Error::FeatureNotSupported: return "Feature not supported on this platform";
 		case Error::Unknown:             return "Unknown error";
 	}
 	return "Unknown error";

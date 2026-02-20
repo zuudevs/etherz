@@ -14,6 +14,7 @@
 #include <span>
 #include <print>
 #include <type_traits>
+#include <expected>
 
 #include "internet_protocol.hpp"
 #include "socket_address.hpp"
@@ -118,6 +119,9 @@ class Socket {
 	static_assert(std::is_same_v<T, Ip<4>> || std::is_same_v<T, Ip<6>>, "Invalid IP version.");
 };
 
+template <typename T>
+struct Connection;
+
 // ═══════════════════════════════════════════════
 //  Socket<Ip<4>> — TCP IPv4
 // ═══════════════════════════════════════════════
@@ -175,50 +179,7 @@ public:
 		return core::Error::None;
 	}
 
-	struct AcceptResult {
-		impl::socket_t client_fd = impl::invalid_socket;
-		address_type address;
-		core::Error error = core::Error::None;
-
-		/**
-		 * @brief Take ownership of the client socket.
-		 * After calling this, client_fd is invalidated.
-		 */
-		Socket take_client() noexcept {
-			Socket s;
-			s.fd_ = client_fd;
-			client_fd = impl::invalid_socket;
-			return s;
-		}
-	};
-
-	AcceptResult accept() noexcept {
-		AcceptResult result;
-		if (fd_ == impl::invalid_socket) {
-			result.error = core::Error::SocketClosed;
-			return result;
-		}
-
-		struct sockaddr_in client_addr{};
-#ifdef _WIN32
-		int client_len = sizeof(client_addr);
-		auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
-#else
-		socklen_t client_len = sizeof(client_addr);
-		auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
-#endif
-
-		if (client_fd == impl::invalid_socket) {
-			result.error = core::last_platform_error();
-			return result;
-		}
-
-		result.client_fd = client_fd;
-		uint32_t net_addr = ntohl(client_addr.sin_addr.s_addr);
-		result.address = address_type(protocol_type(net_addr), ntohs(client_addr.sin_port));
-		result.error = core::Error::None;
-		return result;
-	}
+	auto accept() noexcept -> std::expected<Connection<Ip<4>>, core::Error>;
 
 	core::Error connect(const address_type& addr) noexcept {
 		if (fd_ == impl::invalid_socket) return core::Error::SocketClosed;
@@ -368,45 +329,7 @@ public:
 		return core::Error::None;
 	}
 
-	struct AcceptResult {
-		impl::socket_t client_fd = impl::invalid_socket;
-		address_type address;
-		core::Error error = core::Error::None;
-
-		Socket take_client() noexcept {
-			Socket s;
-			s.fd_ = client_fd;
-			client_fd = impl::invalid_socket;
-			return s;
-		}
-	};
-
-	AcceptResult accept() noexcept {
-		AcceptResult result;
-		if (fd_ == impl::invalid_socket) {
-			result.error = core::Error::SocketClosed;
-			return result;
-		}
-
-		struct sockaddr_in6 client_addr{};
-#ifdef _WIN32
-		int client_len = sizeof(client_addr);
-		auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
-#else
-		socklen_t client_len = sizeof(client_addr);
-		auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
-#endif
-
-		if (client_fd == impl::invalid_socket) {
-			result.error = core::last_platform_error();
-			return result;
-		}
-
-		result.client_fd = client_fd;
-		result.address = address_type(extract_ip6(client_addr.sin6_addr), ntohs(client_addr.sin6_port));
-		result.error = core::Error::None;
-		return result;
-	}
+	auto accept() noexcept -> std::expected<Connection<Ip<6>>, core::Error>;
 
 	core::Error connect(const address_type& addr) noexcept {
 		if (fd_ == impl::invalid_socket) return core::Error::SocketClosed;
@@ -513,6 +436,67 @@ private:
 		);
 	}
 };
+
+
+
+template <typename T>
+struct Connection {
+	Socket<T> socket;
+	typename Socket<T>::address_type address;
+};
+
+// ─── Implementations ────────────────────────
+
+inline auto Socket<Ip<4>>::accept() noexcept -> std::expected<Connection<Ip<4>>, core::Error> {
+	if (fd_ == impl::invalid_socket) {
+		return std::unexpected(core::Error::SocketClosed);
+	}
+
+	struct sockaddr_in client_addr{};
+#ifdef _WIN32
+	int client_len = sizeof(client_addr);
+	auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
+#else
+	socklen_t client_len = sizeof(client_addr);
+	auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
+#endif
+
+	if (client_fd == impl::invalid_socket) {
+		return std::unexpected(core::last_platform_error());
+	}
+
+	Connection<Ip<4>> conn;
+	conn.socket.fd_ = client_fd;
+	uint32_t net_addr = ntohl(client_addr.sin_addr.s_addr);
+	conn.address = address_type(protocol_type(net_addr), ntohs(client_addr.sin_port));
+	
+	return conn;
+}
+
+inline auto Socket<Ip<6>>::accept() noexcept -> std::expected<Connection<Ip<6>>, core::Error> {
+	if (fd_ == impl::invalid_socket) {
+		return std::unexpected(core::Error::SocketClosed);
+	}
+
+	struct sockaddr_in6 client_addr{};
+#ifdef _WIN32
+	int client_len = sizeof(client_addr);
+	auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
+#else
+	socklen_t client_len = sizeof(client_addr);
+	auto client_fd = ::accept(fd_, reinterpret_cast<struct sockaddr*>(&client_addr), &client_len);
+#endif
+
+	if (client_fd == impl::invalid_socket) {
+		return std::unexpected(core::last_platform_error());
+	}
+
+	Connection<Ip<6>> conn;
+	conn.socket.fd_ = client_fd;
+	conn.address = address_type(extract_ip6(client_addr.sin6_addr), ntohs(client_addr.sin6_port));
+	
+	return conn;
+}
 
 } // namespace net
 } // namespace etherz

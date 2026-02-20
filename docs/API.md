@@ -30,7 +30,7 @@
 - `Ip<6>` — IPv6 address (construct, parse, compare)
 
 ### `socket.hpp`
-- `Socket<Ip<V>>` — TCP socket (create, bind, listen, accept, connect, send, recv)
+- `Socket<Ip<V>>` — TCP socket (create, bind, listen, accept -> `expected`, connect, send, recv)
 
 ### `udp_socket.hpp`
 - `UdpSocket<Ip<4>>` — UDP IPv4 socket (sendto, recvfrom)
@@ -75,7 +75,7 @@
 - `HttpHeaders` — Case-insensitive header map
 
 ### `http_client.hpp`
-- `HttpClient::get(url)` / `post(url, body)` — HTTP + HTTPS (DNS-resolved hostnames)
+- `HttpClient::get(url)` / `post(url, body)` → `std::expected<HttpResponse, Error>`
 
 ### `http_server.hpp`
 - `HttpServer` — Routing-based HTTP server (multi-read request handling)

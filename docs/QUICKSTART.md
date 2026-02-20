@@ -47,11 +47,12 @@ namespace etn = etherz::net;
 // IPv4
 auto ip = etn::Ip(192, 168, 1, 1);        // CTAD → Ip<4>
 auto ip2 = etn::Ip<4>{"10.0.0.1"};        // From string
+std::print("IP: {}\n", ip);               // IPv4: 192.168.1.1
 auto next = ip + 1;                         // 192.168.1.2
 
 // IPv6
 auto ip6 = etn::Ip<6>{"2001:db8::1"};
-auto loopback = etn::Ip<6>{"::1"};
+std::print("IPv6: {}\n", ip6);
 ```
 
 ### TCP Socket (Server)
@@ -64,12 +65,16 @@ server.create();
 server.bind(etn::SocketAddress<etn::Ip<4>>(etn::Ip(0,0,0,0), 8080));
 server.listen(5);
 
-auto result = server.accept();
-auto client = result.take_client();
+if (auto result = server.accept()) {
+    auto& conn = *result;
+    std::print("Client connected from: {}\n", conn.address);
 
-uint8_t buf[1024]{};
-int n = client.recv(std::span<uint8_t>(buf, sizeof(buf)));
-client.send(std::span<const uint8_t>(buf, n));
+    uint8_t buf[1024]{};
+    int n = conn.socket.recv(std::span<uint8_t>(buf, sizeof(buf)));
+    conn.socket.send(std::span<const uint8_t>(buf, n));
+} else {
+    std::print("Accept failed: {}\n", result.error());
+}
 // Sockets auto-close on destruction (RAII)
 ```
 
@@ -101,8 +106,8 @@ udp6.bind(etn::SocketAddress<etn::Ip<6>>(etn::Ip<6>{"::"}, 9000));
 #include "net/dns.hpp"
 
 auto result = etn::Dns::resolve("example.com");
-for (auto& ip : result.ipv4_addresses) ip.display();
-for (auto& ip : result.ipv6_addresses) ip.display();
+for (auto& ip : result.ipv4_addresses) std::print("{}\n", ip);
+for (auto& ip : result.ipv6_addresses) std::print("{}\n", ip);
 
 auto hostname = etn::Dns::reverse(etn::Ip<4>(8, 8, 8, 8));
 ```
@@ -113,9 +118,11 @@ auto hostname = etn::Dns::reverse(etn::Ip<4>(8, 8, 8, 8));
 #include "net/subnet.hpp"
 
 auto subnet = etn::Subnet<etn::Ip<4>>::parse("192.168.1.0/24");
-subnet.contains(etn::Ip<4>(192, 168, 1, 50));  // true
-subnet.broadcast().display();                    // 192.168.1.255
-subnet.host_count();                             // 254
+if (subnet) {
+    std::print("Includes .50? {}\n", subnet->contains(etn::Ip<4>(192, 168, 1, 50)));
+    std::print("Broadcast: {}\n", subnet->broadcast());
+    std::print("Hosts: {}\n", subnet->host_count());
+}
 ```
 
 ### ICMP Ping
@@ -151,9 +158,12 @@ etp::HttpClient client;
 
 // HTTP GET — hostnames are automatically DNS-resolved
 auto url = etp::Url::parse("http://example.com");
-auto result = client.get(url);
-std::print("Status: {}\n", static_cast<int>(result.response.status));
-std::print("Body: {}\n", result.response.body);
+if (auto result = client.get(url)) {
+    std::print("Status: {}\n", static_cast<int>(result->status));
+    std::print("Body: {}\n", result->body);
+} else {
+    std::print("Request failed: {}\n", result.error());
+}
 
 // HTTPS (auto-detected by scheme)
 auto url2 = etp::Url::parse("https://example.com");

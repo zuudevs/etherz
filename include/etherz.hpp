@@ -12,6 +12,7 @@
 
 #include <cstdint>
 #include <string_view>
+#include "core/formatters.hpp"
 
 namespace etherz {
 inline consteval uint8_t major() noexcept { return 1; }

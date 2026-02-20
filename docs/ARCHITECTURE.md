@@ -176,7 +176,7 @@ classDiagram
         +create() Error
         +bind(SocketAddress) Error
         +listen(int) Error
-        +accept() AcceptResult
+        +accept() expected<Connection, Error>
         +connect(SocketAddress) Error
         +send(span) int
         +recv(span) int
@@ -195,10 +195,10 @@ classDiagram
     }
 
     class HttpClient {
-        +get(url) Result
-        +post(url, body) Result
-        -send_plain(url) Result
-        -send_secure(url) Result
+        +get(url) expected<HttpResponse, Error>
+        +post(url, body) expected<HttpResponse, Error>
+        -send_plain(url) expected<HttpResponse, Error>
+        -send_secure(url) expected<HttpResponse, Error>
     }
 
     class HttpServer {
@@ -493,6 +493,8 @@ graph TB
 | `std::byteswap` | Network byte order conversion |
 | `std::span` | Buffer views in `send()` / `recv()` |
 | `std::source_location` | Test framework failure reporting |
+| `std::expected` | Modern error handling for fallible operations |
+| `std::formatter` | Custom formatting support for `std::print` |
 | CTAD | Deduction guides: `Ip(a,b,c,d)` → `Ip<4>` |
 
 ---

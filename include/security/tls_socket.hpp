@@ -522,8 +522,7 @@ private:
 #else
 	core::Error perform_handshake() noexcept {
 		// POSIX stub — TLS not yet supported
-		handshake_done_ = true; // Passthrough mode
-		return core::Error::None;
+		return core::Error::FeatureNotSupported;
 	}
 #endif
 };

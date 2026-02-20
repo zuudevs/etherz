@@ -20,14 +20,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`UdpSocket::RecvResult::error`** — Default-initialized to `Error::None`
 - **`Url::to_string()`** — Only omits port when it matches the scheme's default (was unconditionally stripping 80/443)
 - **`HttpClient::post()`** — Added missing `Content-Length` header
+- **`TlsSocket`** — Fixed security issue on POSIX where `perform_handshake` would silently fail open; now returns `FeatureNotSupported`
+
 
 ### Added
 
 - **`UdpSocket<Ip<6>>`** — Full IPv6 UDP socket specialization
+- **`std::formatter`** — Added specializations for `Ip`, `SocketAddress`, and `core::Error` for use with `std::print`
 
 ### Changed
 
-- User-Agent updated from `Etherz/0.5.0` to `Etherz/1.0.0`
+- **`Socket::accept()`** — Now returns `std::expected<Connection<T>, core::Error>` (Breaking Change)
+- **`HttpClient`** — methods `get()` and `post()` now return `std::expected<HttpResponse, core::Error>` (Breaking Change)
+- User-Agent updated from `Etherz/0.5.0` to `Etherz/1.0.1`
 - All header `@version` tags updated to `1.0.0`
 
 ---
