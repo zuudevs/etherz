@@ -2,7 +2,7 @@
  * @file http_server.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Lightweight HTTP/1.1 server
- * @version 0.4.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -85,13 +85,19 @@ public:
 		// Move the fd manually (using take_client pattern)
 		auto client_sock = accept_result.take_client();
 
-		// Receive request
+		// Receive request (loop until headers are complete)
 		std::string request_data;
 		std::array<uint8_t, 8192> buffer{};
-		int received = client_sock.recv(buffer);
-		if (received > 0) {
+		constexpr size_t MAX_REQUEST_SIZE = 1024 * 1024; // 1MB limit
+
+		while (request_data.size() < MAX_REQUEST_SIZE) {
+			int received = client_sock.recv(buffer);
+			if (received <= 0) break;
 			request_data.append(reinterpret_cast<const char*>(buffer.data()),
 				static_cast<size_t>(received));
+
+			// Check if we have complete headers
+			if (request_data.find("\r\n\r\n") != std::string::npos) break;
 		}
 
 		if (request_data.empty()) {

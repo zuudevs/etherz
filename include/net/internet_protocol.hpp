@@ -2,7 +2,7 @@
  * @file internet_protocol.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Internet Protocol Class Implementation
- * @version 0.1.4
+ * @version 1.0.0
  * @date 2026-02-17
  * 
  * @copyright Copyright (c) 2026

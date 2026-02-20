@@ -2,7 +2,7 @@
  * @file poll.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief I/O multiplexing poll wrapper
- * @version 0.3.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -67,6 +67,13 @@ struct PollEntry {
 
 namespace impl {
 
+// Platform-independent pollfd type alias
+#ifdef _WIN32
+using native_pollfd = WSAPOLLFD;
+#else
+using native_pollfd = struct pollfd;
+#endif
+
 /**
  * @brief Convert PollEvent to platform poll flags
  */
@@ -103,13 +110,13 @@ inline int poll(std::span<PollEntry> entries, int timeout_ms) noexcept {
 
 	// Build native pollfd array (stack-allocate for small counts)
 	constexpr size_t STACK_MAX = 64;
-	WSAPOLLFD stack_fds[STACK_MAX];
+	impl::native_pollfd stack_fds[STACK_MAX];
 	
 	auto* fds = stack_fds;
-	std::unique_ptr<WSAPOLLFD[]> heap_fds;
+	std::unique_ptr<impl::native_pollfd[]> heap_fds;
 
 	if (entries.size() > STACK_MAX) {
-		heap_fds = std::make_unique<WSAPOLLFD[]>(entries.size());
+		heap_fds = std::make_unique<impl::native_pollfd[]>(entries.size());
 		fds = heap_fds.get();
 	}
 

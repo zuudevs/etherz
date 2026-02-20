@@ -2,7 +2,7 @@
  * @file event_loop.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Single-threaded event loop for I/O multiplexing
- * @version 0.3.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -83,11 +83,15 @@ public:
 		int ready = async::poll(poll_entries_, timeout_ms);
 		if (ready <= 0) return 0;
 
+		// Snapshot registrations to avoid iterator invalidation
+		// when callbacks call add()/remove()
+		auto snapshot = registrations_;
+
 		int dispatched = 0;
-		for (size_t i = 0; i < poll_entries_.size(); ++i) {
+		for (size_t i = 0; i < poll_entries_.size() && i < snapshot.size(); ++i) {
 			if (poll_entries_[i].returned != PollEvent::None) {
-				if (registrations_[i].callback) {
-					registrations_[i].callback(
+				if (snapshot[i].callback) {
+					snapshot[i].callback(
 						poll_entries_[i].fd,
 						poll_entries_[i].returned
 					);

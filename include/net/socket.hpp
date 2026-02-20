@@ -2,7 +2,7 @@
  * @file socket.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Platform-aware TCP Socket wrapper using RAII
- * @version 0.2.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -178,7 +178,7 @@ public:
 	struct AcceptResult {
 		impl::socket_t client_fd = impl::invalid_socket;
 		address_type address;
-		core::Error error;
+		core::Error error = core::Error::None;
 
 		/**
 		 * @brief Take ownership of the client socket.
@@ -371,7 +371,7 @@ public:
 	struct AcceptResult {
 		impl::socket_t client_fd = impl::invalid_socket;
 		address_type address;
-		core::Error error;
+		core::Error error = core::Error::None;
 
 		Socket take_client() noexcept {
 			Socket s;

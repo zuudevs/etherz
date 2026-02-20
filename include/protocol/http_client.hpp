@@ -2,7 +2,7 @@
  * @file http_client.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Simple HTTP/1.1 client
- * @version 0.4.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -22,6 +22,7 @@
 #include "../net/socket_address.hpp"
 #include "../net/internet_protocol.hpp"
 #include "../security/tls_socket.hpp"
+#include "../net/dns.hpp"
 #include "../core/error.hpp"
 
 namespace etherz {
@@ -52,7 +53,7 @@ public:
 		if (!url.query.empty()) req.path += "?" + url.query;
 		req.headers.set("Host", url.host);
 		req.headers.set("Connection", "close");
-		req.headers.set("User-Agent", "Etherz/0.5.0");
+		req.headers.set("User-Agent", "Etherz/1.0.0");
 		return send_request(url, req);
 	}
 
@@ -67,6 +68,7 @@ public:
 		req.headers.set("Connection", "close");
 		req.headers.set("User-Agent", "Etherz/0.5.0");
 		req.headers.set("Content-Type", std::string(content_type));
+		req.headers.set("Content-Length", std::to_string(body.size()));
 		req.body = std::move(body);
 		return send_request(url, req);
 	}
@@ -96,12 +98,23 @@ public:
 
 private:
 	/**
-	 * @brief Resolve host to IPv4 (simplified — localhost, 127.0.0.1, or direct IP)
+	 * @brief Resolve host to IPv4 via DNS
+	 * 
+	 * Uses Dns::resolve() for hostname lookup, with fallback to
+	 * direct IP string parsing for dotted-decimal addresses.
 	 */
 	static net::Ip<4> resolve_host(const Url& url) noexcept {
 		if (url.host == "localhost" || url.host == "127.0.0.1") {
 			return net::Ip<4>(127, 0, 0, 1);
 		}
+
+		// Try DNS resolution first (handles hostnames like "example.com")
+		auto dns_result = net::Dns::resolve(url.host);
+		if (dns_result.success && !dns_result.ipv4_addresses.empty()) {
+			return dns_result.ipv4_addresses[0];
+		}
+
+		// Fallback: try parsing as a raw IP string
 		return net::Ip<4>{url.host};
 	}
 

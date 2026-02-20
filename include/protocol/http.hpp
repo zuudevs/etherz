@@ -2,7 +2,7 @@
  * @file http.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief HTTP/1.1 request, response, and parser
- * @version 0.4.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026

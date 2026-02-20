@@ -2,7 +2,7 @@
  * @file tls_socket.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief TLS-encrypted socket wrapper using Windows SChannel
- * @version 0.5.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -272,38 +272,63 @@ public:
 		if (!handshake_done_) return -1;
 
 #ifdef _WIN32
-		// Receive encrypted data
-		std::array<uint8_t, 16384> enc_buf{};
-		int received = socket_.recv(enc_buf);
+		// Receive encrypted data, accumulating until a full TLS record
+		std::vector<uint8_t> enc_buf(16384);
+		int total_enc = 0;
+
+		// Initial recv
+		int received = socket_.recv(std::span<uint8_t>(enc_buf.data(), enc_buf.size()));
 		if (received <= 0) return received;
+		total_enc = received;
 
-		SecBuffer buffers[4]{};
-		buffers[0].pvBuffer   = enc_buf.data();
-		buffers[0].cbBuffer   = static_cast<unsigned long>(received);
-		buffers[0].BufferType = SECBUFFER_DATA;
-		buffers[1].BufferType = SECBUFFER_EMPTY;
-		buffers[2].BufferType = SECBUFFER_EMPTY;
-		buffers[3].BufferType = SECBUFFER_EMPTY;
+		// Retry loop for incomplete TLS records
+		for (int attempts = 0; attempts < 10; ++attempts) {
+			SecBuffer buffers[4]{};
+			buffers[0].pvBuffer   = enc_buf.data();
+			buffers[0].cbBuffer   = static_cast<unsigned long>(total_enc);
+			buffers[0].BufferType = SECBUFFER_DATA;
+			buffers[1].BufferType = SECBUFFER_EMPTY;
+			buffers[2].BufferType = SECBUFFER_EMPTY;
+			buffers[3].BufferType = SECBUFFER_EMPTY;
 
-		SecBufferDesc buf_desc;
-		buf_desc.ulVersion = SECBUFFER_VERSION;
-		buf_desc.cBuffers = 4;
-		buf_desc.pBuffers = buffers;
+			SecBufferDesc buf_desc;
+			buf_desc.ulVersion = SECBUFFER_VERSION;
+			buf_desc.cBuffers = 4;
+			buf_desc.pBuffers = buffers;
 
-		SECURITY_STATUS status = DecryptMessage(&sec_ctx_.handle, &buf_desc, 0, nullptr);
-		if (status != SEC_E_OK) return -1;
+			SECURITY_STATUS status = DecryptMessage(&sec_ctx_.handle, &buf_desc, 0, nullptr);
 
-		// Find decrypted data buffer
-		for (int i = 0; i < 4; ++i) {
-			if (buffers[i].BufferType == SECBUFFER_DATA && buffers[i].cbBuffer > 0) {
-				size_t copy_len = (buffers[i].cbBuffer < buffer.size())
-					? buffers[i].cbBuffer : buffer.size();
-				std::copy_n(static_cast<uint8_t*>(buffers[i].pvBuffer),
-					copy_len, buffer.data());
-				return static_cast<int>(copy_len);
+			if (status == SEC_E_OK) {
+				// Find decrypted data buffer
+				for (int i = 0; i < 4; ++i) {
+					if (buffers[i].BufferType == SECBUFFER_DATA && buffers[i].cbBuffer > 0) {
+						size_t copy_len = (buffers[i].cbBuffer < buffer.size())
+							? buffers[i].cbBuffer : buffer.size();
+						std::copy_n(static_cast<uint8_t*>(buffers[i].pvBuffer),
+							copy_len, buffer.data());
+						return static_cast<int>(copy_len);
+					}
+				}
+				return -1;
 			}
+
+			if (status == SEC_E_INCOMPLETE_MESSAGE) {
+				// Need more data — grow buffer if needed and recv again
+				if (static_cast<size_t>(total_enc) >= enc_buf.size()) {
+					enc_buf.resize(enc_buf.size() + 4096);
+				}
+				received = socket_.recv(std::span<uint8_t>(
+					enc_buf.data() + total_enc,
+					enc_buf.size() - static_cast<size_t>(total_enc)));
+				if (received <= 0) return -1;
+				total_enc += received;
+				continue; // Retry decrypt
+			}
+
+			// Any other error
+			return -1;
 		}
-		return -1;
+		return -1; // Too many attempts
 #else
 		return socket_.recv(buffer);
 #endif

@@ -2,7 +2,7 @@
  * @file tls_context.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief TLS/SSL context and configuration
- * @version 0.5.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026

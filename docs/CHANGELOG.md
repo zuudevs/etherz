@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.1] — 2026-02-20
+
+### Fixed
+
+- **`poll.hpp`** — Cross-platform `native_pollfd` typedef (was using `WSAPOLLFD` unconditionally)
+- **`HttpClient::resolve_host()`** — Now uses `Dns::resolve()` for real hostname resolution
+- **`TlsSocket::recv()`** — Handles `SEC_E_INCOMPLETE_MESSAGE` with accumulation loop for partial TLS records
+- **`HttpServer::handle_one()`** — Reads in a loop until headers are complete (supports requests > 8KB, 1MB limit)
+- **`EventLoop::run_once()`** — Snapshots registrations before dispatch to prevent iterator invalidation
+- **`AcceptResult::error`** — Default-initialized to `Error::None` (IPv4 + IPv6)
+- **`UdpSocket::RecvResult::error`** — Default-initialized to `Error::None`
+- **`Url::to_string()`** — Only omits port when it matches the scheme's default (was unconditionally stripping 80/443)
+- **`HttpClient::post()`** — Added missing `Content-Length` header
+
+### Added
+
+- **`UdpSocket<Ip<6>>`** — Full IPv6 UDP socket specialization
+
+### Changed
+
+- User-Agent updated from `Etherz/0.5.0` to `Etherz/1.0.0`
+- All header `@version` tags updated to `1.0.0`
+
+---
+
 ## [1.0.0] — 2026-02-19
 
 ### Added

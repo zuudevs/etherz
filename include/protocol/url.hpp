@@ -2,7 +2,7 @@
  * @file url.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief URL parsing utility
- * @version 0.4.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026
@@ -104,7 +104,11 @@ struct Url {
 		std::string s;
 		if (!scheme.empty()) s += scheme + "://";
 		s += host;
-		if (port != 0 && port != 80 && port != 443) {
+		// Only omit port if it's the default for this scheme
+		bool is_default_port =
+			(port == 80  && (scheme == "http"  || scheme == "ws")) ||
+			(port == 443 && (scheme == "https" || scheme == "wss"));
+		if (port != 0 && !is_default_port) {
 			s += ":" + std::to_string(port);
 		}
 		s += path;

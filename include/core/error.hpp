@@ -2,7 +2,7 @@
  * @file error.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Error types for networking operations
- * @version 0.2.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026

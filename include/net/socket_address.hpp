@@ -2,7 +2,7 @@
  * @file socket_address.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Socket Address implementation for IPv4 and IPv6
- * @version 0.1.1
+ * @version 1.0.0
  * @date 2026-02-18
  * 
  * @copyright Copyright (c) 2026

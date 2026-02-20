@@ -2,7 +2,7 @@
  * @file network_interface.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Network interface enumeration
- * @version 0.6.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026

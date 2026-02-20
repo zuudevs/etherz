@@ -2,7 +2,7 @@
  * @file async_socket.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief Async socket wrapper with callback-based operations
- * @version 0.3.0
+ * @version 1.0.0
  * @date 2026-02-19
  * 
  * @copyright Copyright (c) 2026

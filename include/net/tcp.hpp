@@ -2,7 +2,7 @@
  * @file tcp.hpp
  * @author zuudevs (zuudevs@gmail.com)
  * @brief TCP endpoint implementation
- * @version 0.1.1
+ * @version 1.0.0
  * @date 2026-02-18
  * 
  * @copyright Copyright (c) 2026
