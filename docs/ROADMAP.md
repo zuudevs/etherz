@@ -1,8 +1,8 @@
 # Roadmap
 
-## Current Status: v0.1.0 (Alpha)
+## Current Status: v2.0.0 (Stable)
 
-Core networking primitives are implemented. The library provides IPv4/IPv6 addresses, socket addresses, TCP endpoints, a basic socket wrapper, and error handling.
+Core networking library is stable and production-ready. All milestones (v0.1–v2.0) are complete, including connection pooling, multicast, proxy/SOCKS5, rate limiting, platform I/O backends, Unix sockets, serial ports, HTTP/2, and gRPC.
 
 ---
 
@@ -81,19 +81,78 @@ Core networking primitives are implemented. The library provides IPv4/IPv6 addre
 
 ---
 
-## Future Ideas (Post v1.0)
+## v1.1.0 — Connection Pooling & Multicast
 
-- **Multicast** support
-- **Unix domain sockets**
-- **Serial port** communication
-- **gRPC / Protocol Buffers** integration
-- **io_uring** (Linux) / **IOCP** (Windows) backends
-- **Connection pooling**
-- **Rate limiting** and traffic shaping
-- **Proxy** support (SOCKS5, HTTP CONNECT)
+**Goal:** Reusable connections and multicast networking.
+
+- [x] `ConnectionPool<T>` — Reusable TCP connection pool (max connections, idle timeout, keep-alive)
+- [x] `HttpClient` keep-alive — Persistent connections via `Connection: keep-alive`
+- [x] `MulticastSocket<T>` — `join_group()`, `leave_group()`, `set_ttl()`, send/recv multicast datagrams
+- [x] Multicast example program
+
+---
+
+## v1.2.0 — Proxy & SOCKS5 Support
+
+**Goal:** Route traffic through proxy servers.
+
+- [x] `ProxyConfig` — Proxy type (SOCKS5, HTTP), host, port, credentials
+- [x] `Socks5Client` — SOCKS5 handshake (RFC 1928), username/password auth, TCP CONNECT
+- [x] HTTP CONNECT tunneling in `HttpClient`
+- [x] `HttpClient::set_proxy()` / `TlsSocket` proxy tunneling
+- [x] Proxy example program
+
+---
+
+## v1.3.0 — Rate Limiting & Traffic Shaping
+
+**Goal:** Control bandwidth and request rates.
+
+- [x] `RateLimiter` — Token-bucket algorithm, configurable rate + burst size
+- [x] `ThrottledSocket<T>` — Socket wrapper enforcing send/recv rate limits
+- [x] `HttpServer` middleware — Per-route and global rate limiting
+- [x] Bandwidth monitoring — Track bytes sent/received per socket
+
+---
+
+## v1.4.0 — Platform I/O Backends
+
+**Goal:** High-performance, platform-native async I/O.
+
+- [x] `IoBackend` abstraction — Platform-agnostic async I/O interface (concept-based)
+- [x] IOCP backend (Windows) — `CreateIoCompletionPort`, overlapped I/O
+- [x] io_uring backend (Linux) — `io_uring_setup`, submission/completion ring
+- [x] kqueue backend (macOS/BSD) — `kqueue()`, `kevent()` integration
+- [x] `EventLoop` refactor — Pluggable backend selection at compile time
+- [x] Benchmarks — poll vs. native backend comparison
+
+---
+
+## v1.5.0 — Unix Domain Sockets & Serial Port
+
+**Goal:** IPC and hardware communication.
+
+- [x] `UnixSocket` — AF_UNIX stream + datagram support (POSIX only)
+- [x] `UnixSocketAddress` — Path-based addressing
+- [x] `SerialPort` — Open, configure (baud rate, parity, stop bits), read/write
+- [x] Platform abstraction for serial (`CreateFile` on Windows, `termios` on POSIX)
+- [x] Example programs for Unix sockets and serial port
+
+---
+
+## v2.0.0 — gRPC & Protocol Buffers
+
+**Goal:** High-level RPC framework built on HTTP/2.
+
+- [x] HTTP/2 framing — HPACK header compression, stream multiplexing
+- [x] `GrpcChannel` — Channel to a gRPC server
+- [x] `GrpcServer` — Service registration and dispatch
+- [x] Protocol Buffers codec — Serialize/deserialize `.proto` messages
+- [x] Streaming support — Unary, server-streaming, client-streaming, bidirectional
+- [x] gRPC example program
 
 ---
 
 ## Contributing
 
-Want to help? See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to get started. Pick any unchecked item from the roadmap and open a PR!
+Want to help? See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to get started.

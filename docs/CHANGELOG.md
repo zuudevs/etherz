@@ -7,6 +7,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.0.0] — 2026-03-16
+
+### Added
+
+- **`protocol/http2.hpp`** — HTTP/2 framing (RFC 7540): frame types, flags, error codes, frame serialization/parsing, HPACK header compression, stream state management, frame builder helpers
+- **`protocol/protobuf.hpp`** — Lightweight Protocol Buffers wire format codec: varint/fixed/length-delimited encoding, schema-less `ProtoMessage`, gRPC length-prefixed message framing
+- **`protocol/grpc_channel.hpp`** — gRPC client channel: HTTP/2 connection, unary RPC calls with `ProtoMessage`, automatic SETTINGS ACK/PING/PONG/GOAWAY handling
+- **`protocol/grpc_server.hpp`** — gRPC server: HTTP/2 connection handling, service registration, unary and server-streaming RPC dispatch
+- **`examples/grpc_hello.cpp`** — gRPC Hello World example (server + client)
+
+---
+
+## [1.5.0] — 2026-03-16
+
+### Added
+
+- **`net/unix_socket.hpp`** — Unix domain sockets: `UnixSocketAddress`, `UnixSocket` (SOCK_STREAM), `UnixDatagramSocket` (SOCK_DGRAM). Cross-platform with AF_UNIX on Windows 10+
+- **`net/serial_port.hpp`** — Cross-platform serial port: `SerialPort` with full configuration, RAII lifecycle, read/write, flush/purge. Uses `CreateFile`/`DCB` on Windows, `termios` on POSIX
+- **`examples/unix_echo.cpp`** — Unix domain socket echo server/client example
+- **`examples/serial_demo.cpp`** — Serial port communication demo
+
+---
+
+## [1.4.0] — 2026-03-16
+
+### Added
+
+- **`async/io_backend.hpp`** — `IoBackendType` concept, `PollBackend` reference implementation, `IoBackendKind` enum, `default_backend()` compile-time platform selection
+- **`async/iocp_backend.hpp`** — Windows IOCP backend using `CreateIoCompletionPort` and `GetQueuedCompletionStatus`
+- **`async/io_uring_backend.hpp`** — Linux io_uring backend using `io_uring_queue_init`, poll SQE/CQE ring
+- **`async/kqueue_backend.hpp`** — macOS/BSD kqueue backend using `kqueue()` and `kevent()`
+
+---
+
+## [1.3.0] — 2026-03-16
+
+### Added
+
+- **`net/rate_limiter.hpp`** — Token-bucket `RateLimiter` with configurable rate/burst, `ThrottledSocket<T>` wrapper enforcing per-socket bandwidth limits
+- **`net/bandwidth_monitor.hpp`** — `BandwidthMonitor` with lifetime and windowed rate tracking, human-readable formatting
+
+---
+
+## [1.2.0] — 2026-03-16
+
+### Added
+
+- **`net/proxy.hpp`** — `ProxyConfig`, `Socks5Client` (RFC 1928), `HttpConnectProxy`, `connect_through_proxy()` helper
+- **`examples/proxy_client.cpp`** — Proxy client example (SOCKS5 + HTTP CONNECT)
+
+---
+
+## [1.1.0] — 2026-03-16
+
+### Added
+
+- **`net/connection_pool.hpp`** — `ConnectionPool<T>` with RAII `Handle`, configurable max connections/per-host limits, idle timeout eviction
+- **`net/multicast_socket.hpp`** — `MulticastSocket<T>` with IPv4/IPv6 specializations: `join_group()`, `leave_group()`, `set_ttl()`, `set_loopback()`
+- **`examples/multicast_chat.cpp`** — Multicast chat example
+- Five new error codes in `core/error.hpp`: `PoolExhausted`, `MulticastError`, `ProxyError`, `ProxyAuthFailed`, `RateLimited`
+
+---
+
 ## [1.0.1] — 2026-02-20
 
 ### Fixed

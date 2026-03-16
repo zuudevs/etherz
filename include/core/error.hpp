@@ -56,6 +56,11 @@ enum class Error : uint8_t {
 	HandshakeFailed,
 	CertificateError,
 	FeatureNotSupported,
+	PoolExhausted,
+	MulticastError,
+	ProxyError,
+	ProxyAuthFailed,
+	RateLimited,
 	Unknown
 };
 
@@ -170,6 +175,11 @@ inline constexpr std::string_view error_message(Error err) noexcept {
 		case Error::HandshakeFailed:     return "TLS handshake failed";
 		case Error::CertificateError:    return "Certificate error";
 		case Error::FeatureNotSupported: return "Feature not supported on this platform";
+		case Error::PoolExhausted:       return "Connection pool exhausted";
+		case Error::MulticastError:      return "Multicast operation failed";
+		case Error::ProxyError:          return "Proxy connection failed";
+		case Error::ProxyAuthFailed:     return "Proxy authentication failed";
+		case Error::RateLimited:         return "Rate limit exceeded";
 		case Error::Unknown:             return "Unknown error";
 	}
 	return "Unknown error";

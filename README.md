@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Etherz
+# Etherz
 
 **Modern C++23 Header-Only Networking Library**
 
@@ -16,7 +16,7 @@
 
 ---
 
-## ✨ Features
+## Features
 
 - **IPv4 & IPv6** — Full IP address representation with parsing, arithmetic, and comparison
 - **TCP & UDP Sockets** — RAII socket wrappers with platform abstraction
@@ -31,7 +31,7 @@
 - **Header-Only** — Just `#include` and go, no linking required
 - **Modern C++23** — Uses concepts, `<=>` operator, `std::print`, `constexpr`, CTAD, and more
 
-## 📋 Requirements
+## Requirements
 
 | Requirement | Minimum |
 |-------------|---------|
@@ -39,7 +39,7 @@
 | CMake | 3.20+ |
 | Compiler | MSVC 19.38+, Clang 17+, GCC 14+ |
 
-## 🚀 Quick Start
+## Quick Start
 
 ```cpp
 #include "net/internet_protocol.hpp"
@@ -79,7 +79,7 @@ int main() {
 }
 ```
 
-## 🏗️ Build
+## Build
 
 ```bash
 # Basic build
@@ -94,7 +94,7 @@ cmake --build build
 
 See [BUILD.md](BUILD.md) for detailed build instructions.
 
-## 📖 Documentation
+## Documentation
 
 | Document | Description |
 |----------|-------------|
@@ -106,7 +106,7 @@ See [BUILD.md](BUILD.md) for detailed build instructions.
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
 | [SECURITY.md](SECURITY.md) | Security policy |
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 etherz/
@@ -146,10 +146,10 @@ etherz/
 └── CMakeLists.txt                  # Build configuration
 ```
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License — see [LICENSE.md](LICENSE.md) for details.
 
-## 👤 Author
+## Author
 
 **zuudevs** — [GitHub](https://github.com/zuudevs) · [Email](mailto:zuudevs@gmail.com)
