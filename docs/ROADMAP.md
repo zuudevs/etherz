@@ -1,8 +1,8 @@
 # Roadmap
 
-## Current Status: v2.0.0 (Stable)
+## Current Status: v3.0.0 (Stable)
 
-Core networking library is stable and production-ready. All milestones (v0.1–v2.0) are complete, including connection pooling, multicast, proxy/SOCKS5, rate limiting, platform I/O backends, Unix sockets, serial ports, HTTP/2, and gRPC.
+Core networking library is stable and production-ready. All milestones (v0.1–v3.0) are complete, including connection pooling, multicast, proxy/SOCKS5, rate limiting, platform I/O backends, Unix/serial, HTTP/2, gRPC, coroutines, DTLS, MQTT, FTP/SMTP, mDNS/DNS-SD, and compression.
 
 ---
 
@@ -150,6 +150,69 @@ Core networking library is stable and production-ready. All milestones (v0.1–v
 - [x] Protocol Buffers codec — Serialize/deserialize `.proto` messages
 - [x] Streaming support — Unary, server-streaming, client-streaming, bidirectional
 - [x] gRPC example program
+
+---
+
+## v2.1.0 — C++20 Coroutines & Async Improvements
+
+**Goal:** First-class coroutine support for async I/O.
+
+- [x] `Task<T>` — Lazy coroutine return type with `co_await` support for socket ops
+- [x] `Generator<T>` — Coroutine-based lazy sequence generator for streaming data
+- [x] `Timer` — Async timer with one-shot and repeating modes
+- [x] Coroutine echo server example
+
+---
+
+## v2.2.0 — DTLS & Secure UDP
+
+**Goal:** Encrypted datagram transport.
+
+- [x] `DtlsContext` — DTLS session configuration, cipher suites
+- [x] `DtlsSocket<T>` — Encrypted UDP wrapper with DTLS 1.2/1.3 handshake
+- [x] DTLS chat example
+
+---
+
+## v2.3.0 — MQTT Protocol
+
+**Goal:** IoT messaging protocol support.
+
+- [x] MQTT 3.1.1/5.0 packet types, serialization, QoS levels
+- [x] `MqttClient` — Connect, publish, subscribe, keep-alive
+- [x] MQTT publish/subscribe example
+
+---
+
+## v2.4.0 — FTP & SMTP Protocols
+
+**Goal:** File transfer and email protocols.
+
+- [x] `FtpClient` — Login, list, upload, download, passive mode
+- [x] `SmtpClient` — Send emails with STARTTLS, attachments, MIME encoding
+- [x] FTP download and email sending examples
+
+---
+
+## v2.5.0 — mDNS & Service Discovery
+
+**Goal:** Zero-config networking and LAN discovery.
+
+- [x] `MdnsResponder` / `MdnsQuery` — Multicast DNS (RFC 6762)
+- [x] `ServiceBrowser` / `ServiceRegistrar` — DNS-SD (RFC 6763)
+- [x] LAN service discovery example
+
+---
+
+## v3.0.0 — Compression & Advanced Streams
+
+**Goal:** Data compression and advanced stream processing.
+
+- [x] `Deflate` / `Gzip` / `Zstd` codec — Compress/decompress buffers
+- [x] `CompressedSocket<T>` — Transparent per-connection compression
+- [x] `ByteStream` — Ring-buffered read/write with backpressure
+- [x] `Pipe` — In-process bidirectional byte stream
+- [x] File transfer with compression example
 
 ---
 

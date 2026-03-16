@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.0.0] — 2026-03-16
+
+### Added
+
+- **`net/compression.hpp`** — Built-in RLE and LZ77 codecs, unified `compress()`/`decompress()` interface, `CompressionType` enum
+- **`net/compressed_socket.hpp`** — `CompressedSocket<T>` with framed wire format (original + compressed size header), transparent compression/decompression, ratio tracking
+- **`net/stream.hpp`** — `ByteStream` ring-buffered read/write with backpressure, peek/skip, capacity and throughput stats
+- **`net/pipe.hpp`** — Bidirectional in-process `Pipe` using two `ByteStream` instances, `PipeEnd` for each direction
+- **`examples/compressed_transfer.cpp`** — Compression, ByteStream, and Pipe demo
+
+---
+
+## [2.5.0] — 2026-03-16
+
+### Added
+
+- **`net/mdns.hpp`** — Multicast DNS (RFC 6762): `MdnsQuery` and `MdnsResponder`, DNS wire-format name encoding/decoding, record types (A/AAAA/PTR/SRV/TXT)
+- **`net/service_discovery.hpp`** — DNS-SD (RFC 6763): `ServiceBrowser` for LAN discovery, `ServiceRegistrar` for advertising services, `ServiceInfo` with TXT record support
+- **`examples/service_browser.cpp`** — mDNS service browse/register example
+
+---
+
+## [2.4.0] — 2026-03-16
+
+### Added
+
+- **`protocol/ftp_client.hpp`** — `FtpClient` with PASV mode, login, PWD, CWD, LIST, RETR, STOR, DELE, SIZE
+- **`protocol/smtp_client.hpp`** — `SmtpClient` with AUTH LOGIN, MIME multipart with attachments, base64 encoding
+- **`examples/ftp_download.cpp`** — FTP download example
+- **`examples/send_email.cpp`** — SMTP email sending example
+
+---
+
+## [2.3.0] — 2026-03-16
+
+### Added
+
+- **`protocol/mqtt.hpp`** — MQTT 3.1.1 packet types, QoS levels, variable-length encoding, packet builders (CONNECT/PUBLISH/SUBSCRIBE/UNSUBSCRIBE/PINGREQ/DISCONNECT)
+- **`protocol/mqtt_client.hpp`** — `MqttClient` with connect/publish/subscribe, per-topic callbacks, QoS 0/1, keep-alive ping
+- **`examples/mqtt_pubsub.cpp`** — MQTT publish/subscribe example
+
+---
+
+## [2.2.0] — 2026-03-16
+
+### Added
+
+- **`security/dtls_context.hpp`** — `DtlsContext` and `DtlsConfig` for DTLS 1.2/1.3, certificate paths, MTU, retransmission timeouts, cookie-based DoS protection
+- **`security/dtls_socket.hpp`** — `DtlsSocket<T>` encrypted UDP wrapper with handshake state machine, send/recv with SChannel integration
+- **`examples/dtls_chat.cpp`** — DTLS encrypted chat example
+
+---
+
+## [2.1.0] — 2026-03-16
+
+### Added
+
+- **`async/task.hpp`** — `Task<T>` lazy coroutine type with void specialization, symmetric transfer, `run()` for sync execution, plus `Yield`, `ReadyAwaitable`, and `CallbackAwaitable` helpers
+- **`async/generator.hpp`** — `Generator<T>` coroutine-based lazy sequence with range-for support, manual `next()`/`value()` iteration
+- **`async/timer.hpp`** — `Timer` with `set_timeout()`, `set_interval()`, `cancel()`, and coroutine `co_await Timer::delay()`
+- **`examples/coroutine_echo.cpp`** — Coroutine echo server example
+
+---
+
 ## [2.0.0] — 2026-03-16
 
 ### Added
