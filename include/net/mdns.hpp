@@ -58,7 +58,7 @@ struct DnsRecord {
 	void set_ipv4(const Ip<4>& ip) {
 		type = DnsRecordType::A;
 		rdata.resize(4);
-		auto octets = ip.octets();
+		auto octets = ip.bytes();
 		rdata[0] = octets[0]; rdata[1] = octets[1];
 		rdata[2] = octets[2]; rdata[3] = octets[3];
 	}
@@ -174,7 +174,7 @@ public:
 				std::span<const uint8_t>(buffer.data(),
 					static_cast<size_t>(result.bytes)));
 			for (const auto& record : records) {
-				callback(record, result.sender.ip());
+				callback(record, result.sender.address());
 			}
 		}
 

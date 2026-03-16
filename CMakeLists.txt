@@ -35,6 +35,10 @@ else()
     )
 endif()
 
+if(WIN32)
+    add_compile_definitions(NOMINMAX)
+endif()
+
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
     if(MSVC)
         add_compile_options(/O2)
@@ -67,6 +71,20 @@ if(ETHERZ_BUILD_TESTS)
         tests/test_http.cpp
         tests/test_websocket.cpp
         tests/test_certificate.cpp
+        tests/test_error.cpp
+        tests/test_rate_limiter.cpp
+        tests/test_io_backend.cpp
+        tests/test_coroutine.cpp
+        tests/test_http2.cpp
+        tests/test_protobuf.cpp
+        tests/test_mqtt.cpp
+        tests/test_dtls.cpp
+        tests/test_smtp.cpp
+        tests/test_mdns.cpp
+        tests/test_service_discovery.cpp
+        tests/test_compression.cpp
+        tests/test_stream.cpp
+        tests/test_pipe.cpp
     )
     target_include_directories(etherz_tests PRIVATE
         "${CMAKE_SOURCE_DIR}/include"

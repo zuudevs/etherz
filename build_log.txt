@@ -1,0 +1,60 @@
+﻿[1/5] Building CXX object CMakeFiles\etherz_tests.dir\tests\test_mdns.cpp.obj
+FAILED: [code=1] CMakeFiles/etherz_tests.dir/tests/test_mdns.cpp.obj 
+D:\program\LLVM\bin\clang-cl.exe  /nologo -TP  -ID:\Project\etherz\include -ID:\Project\etherz\tests /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -clang:-std=c++23 -MDd /W4 /permissive- /utf-8 /showIncludes /FoCMakeFiles\etherz_tests.dir\tests\test_mdns.cpp.obj /FdCMakeFiles\etherz_tests.dir\ -c -- D:\Project\etherz\tests\test_mdns.cpp
+In file included from D:\Project\etherz\tests\test_mdns.cpp:2:
+D:\Project\etherz\include\net/mdns.hpp(61,20): error: no member named 'octets' in 'etherz::net::Ip<4>'
+   61 |                 auto octets = ip.octets();
+      |                               ~~ ^
+D:\Project\etherz\include\net/mdns.hpp(177,36): error: no member named 'ip' in 'etherz::net::SocketAddress<Ip<4>>'
+  177 |                                 callback(record, result.sender.ip());
+      |                                                  ~~~~~~~~~~~~~ ^
+D:\Project\etherz\include\net/mdns.hpp(319,31): warning: unused parameter 'sender' [-Wunused-parameter]
+  319 |                 const SocketAddress<Ip<4>>& sender)
+      |                                             ^
+1 warning and 2 errors generated.
+[2/5] Building CXX object CMakeFiles\etherz_tests.dir\tests\test_io_backend.cpp.obj
+FAILED: [code=1] CMakeFiles/etherz_tests.dir/tests/test_io_backend.cpp.obj 
+D:\program\LLVM\bin\clang-cl.exe  /nologo -TP  -ID:\Project\etherz\include -ID:\Project\etherz\tests /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -clang:-std=c++23 -MDd /W4 /permissive- /utf-8 /showIncludes /FoCMakeFiles\etherz_tests.dir\tests\test_io_backend.cpp.obj /FdCMakeFiles\etherz_tests.dir\ -c -- D:\Project\etherz\tests\test_io_backend.cpp
+In file included from D:\Project\etherz\tests\test_io_backend.cpp:2:
+In file included from D:\Project\etherz\include\async/io_backend.hpp:18:
+D:\Project\etherz\include\async\poll.hpp(63,2): error: use of undeclared identifier 'net'
+   63 |         net::impl::socket_t fd = net::impl::invalid_socket;
+      |         ^
+In file included from D:\Project\etherz\tests\test_io_backend.cpp:2:
+D:\Project\etherz\include\async/io_backend.hpp(49,22): error: unknown type name 'EventCallback'
+   49 |         PollEvent interest, EventCallback cb, int timeout_ms)
+      |                             ^
+D:\Project\etherz\include\async/io_backend.hpp(116,55): error: unknown type name 'EventCallback'
+  116 |         void add(net::impl::socket_t fd, PollEvent interest, EventCallback callback) {
+      |                                                              ^
+D:\Project\etherz\include\async/io_backend.hpp(173,3): error: unknown type name 'EventCallback'
+  173 |                 EventCallback callback;
+      |                 ^
+4 errors generated.
+[3/5] Building CXX object CMakeFiles\etherz_tests.dir\tests\test_service_discovery.cpp.obj
+FAILED: [code=1] CMakeFiles/etherz_tests.dir/tests/test_service_discovery.cpp.obj 
+D:\program\LLVM\bin\clang-cl.exe  /nologo -TP  -ID:\Project\etherz\include -ID:\Project\etherz\tests /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -clang:-std=c++23 -MDd /W4 /permissive- /utf-8 /showIncludes /FoCMakeFiles\etherz_tests.dir\tests\test_service_discovery.cpp.obj /FdCMakeFiles\etherz_tests.dir\ -c -- D:\Project\etherz\tests\test_service_discovery.cpp
+In file included from D:\Project\etherz\tests\test_service_discovery.cpp:2:
+In file included from D:\Project\etherz\include\net/service_discovery.hpp:20:
+D:\Project\etherz\include\net\mdns.hpp(61,20): error: no member named 'octets' in 'etherz::net::Ip<4>'
+   61 |                 auto octets = ip.octets();
+      |                               ~~ ^
+D:\Project\etherz\include\net\mdns.hpp(177,36): error: no member named 'ip' in 'etherz::net::SocketAddress<Ip<4>>'
+  177 |                                 callback(record, result.sender.ip());
+      |                                                  ~~~~~~~~~~~~~ ^
+D:\Project\etherz\include\net\mdns.hpp(319,31): warning: unused parameter 'sender' [-Wunused-parameter]
+  319 |                 const SocketAddress<Ip<4>>& sender)
+      |                                             ^
+1 warning and 2 errors generated.
+[4/5] Building CXX object CMakeFiles\etherz_tests.dir\tests\test_rate_limiter.cpp.obj
+FAILED: [code=1] CMakeFiles/etherz_tests.dir/tests/test_rate_limiter.cpp.obj 
+D:\program\LLVM\bin\clang-cl.exe  /nologo -TP  -ID:\Project\etherz\include -ID:\Project\etherz\tests /DWIN32 /D_WINDOWS /EHsc /Zi /Ob0 /Od /RTC1 -clang:-std=c++23 -MDd /W4 /permissive- /utf-8 /showIncludes /FoCMakeFiles\etherz_tests.dir\tests\test_rate_limiter.cpp.obj /FdCMakeFiles\etherz_tests.dir\ -c -- D:\Project\etherz\tests\test_rate_limiter.cpp
+In file included from D:\Project\etherz\tests\test_rate_limiter.cpp:2:
+D:\Project\etherz\include\net/rate_limiter.hpp(133,18): error: expected unqualified-id
+  133 |                 tokens_ = std::min(burst_, tokens_ + elapsed * rate_);
+      |                                ^
+D:\dev-tools\win-sdk\Include\10.0.26100.0\shared\minwindef.h(197,29): note: expanded from macro 'min'
+  197 | #define min(a,b)            (((a) < (b)) ? (a) : (b))
+      |                             ^
+1 error generated.
+ninja: build stopped: subcommand failed.
