@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(
 	etherz
-	VERSION 1.0.0
+	VERSION 4.0.0
 	DESCRIPTION "A modern C++23 header-only networking library"
 	LANGUAGES CXX
 )
@@ -54,6 +54,7 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     "${CMAKE_SOURCE_DIR}/include"
+    "${CMAKE_SOURCE_DIR}/third_party/zuu-json/include"
 )
 
 # ─── Link libraries (Windows) ───
@@ -85,10 +86,20 @@ if(ETHERZ_BUILD_TESTS)
         tests/test_compression.cpp
         tests/test_stream.cpp
         tests/test_pipe.cpp
+        tests/test_upnp.cpp
+        tests/test_stun.cpp
+        tests/test_ws_client.cpp
+        tests/test_rest.cpp
+        tests/test_thread_pool.cpp
+        third_party/zuu-json/src/api.cpp
+        third_party/zuu-json/src/parser.cpp
+        third_party/zuu-json/src/tokenizer.cpp
+        third_party/zuu-json/src/writer.cpp
     )
     target_include_directories(etherz_tests PRIVATE
         "${CMAKE_SOURCE_DIR}/include"
         "${CMAKE_SOURCE_DIR}/tests"
+        "${CMAKE_SOURCE_DIR}/third_party/zuu-json/include"
     )
     if(WIN32)
         target_link_libraries(etherz_tests PRIVATE ws2_32 secur32 iphlpapi)
@@ -102,16 +113,35 @@ if(ETHERZ_BUILD_EXAMPLES)
         dns_lookup
         ping_tool
         subnet_calc
+        nat_traversal
+        ws_chat
+        threaded_server
     )
     foreach(example ${ETHERZ_EXAMPLES})
         add_executable(${example} examples/${example}.cpp)
         target_include_directories(${example} PRIVATE
             "${CMAKE_SOURCE_DIR}/include"
+            "${CMAKE_SOURCE_DIR}/third_party/zuu-json/include"
         )
         if(WIN32)
             target_link_libraries(${example} PRIVATE ws2_32 secur32 iphlpapi)
         endif()
     endforeach()
+
+    # REST API example needs zuu-json sources
+    add_executable(rest_api examples/rest_api.cpp
+        third_party/zuu-json/src/api.cpp
+        third_party/zuu-json/src/parser.cpp
+        third_party/zuu-json/src/tokenizer.cpp
+        third_party/zuu-json/src/writer.cpp
+    )
+    target_include_directories(rest_api PRIVATE
+        "${CMAKE_SOURCE_DIR}/include"
+        "${CMAKE_SOURCE_DIR}/third_party/zuu-json/include"
+    )
+    if(WIN32)
+        target_link_libraries(rest_api PRIVATE ws2_32 secur32 iphlpapi)
+    endif()
 endif()
 
 # ─── Install ────────────────────

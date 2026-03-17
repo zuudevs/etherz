@@ -4,12 +4,10 @@
 
 ## Namespaces
 
-| Namespace | Description |
-|-----------|-------------|
 | `etherz::core` | Error handling, platform abstractions |
-| `etherz::net` | IP, sockets, DNS, subnet, ping, interfaces |
-| `etherz::async` | Poll, event loop, async socket |
-| `etherz::protocol` | URL, HTTP, WebSocket |
+| `etherz::net` | IP, sockets, DNS, subnet, ping, interfaces, UPnP, STUN |
+| `etherz::async` | Poll, event loop, async socket, thread pool, parallel acceptor |
+| `etherz::protocol` | URL, HTTP, WebSocket, REST, MQTT, gRPC |
 | `etherz::security` | TLS context, TLS socket, certificates |
 
 ---
@@ -17,7 +15,7 @@
 ## Core (`core/`)
 
 ### `error.hpp`
-- `enum class Error` — Unified error codes
+- `enum class Error` — Unified error codes (includes `UpnpError`, `StunError`)
 - `error_message(Error)` — Human-readable error string
 - `from_platform_error(int)` — Platform code → Error mapping
 
@@ -50,6 +48,17 @@
 ### `ping.hpp`
 - `ping(Ip<4>, timeout)` → `PingResult`
 
+### `upnp.hpp`
+- `UpnpClient::discover()` — SSDP M-SEARCH for IGD devices
+- `UpnpClient::fetch_control_url()` — Fetch SOAP control URL
+- `UpnpClient::add_port_mapping()` / `delete_port_mapping()` — Port mapping management
+- `UpnpClient::get_external_ip()` → `expected<string, Error>`
+
+### `stun.hpp`
+- `StunClient::query(server)` → `StunResult` (public IP, port, NAT type)
+- `StunClient::get_public_ip()` → `expected<Ip<4>, Error>`
+- `enum class NatType` — Open, FullCone, Restricted, PortRestricted, Symmetric
+
 ---
 
 ## Async (`async/`)
@@ -62,6 +71,15 @@
 
 ### `async_socket.hpp`
 - `AsyncSocket` — Non-blocking socket with async ops
+
+### `thread_pool.hpp`
+- `ThreadPool(num_threads)` — Worker pool with task queue
+- `submit(callable, args...)` → `std::future<R>` — Submit task with future result
+- `shutdown()` / `is_stopped()` / `pending_tasks()` / `thread_count()`
+
+### `parallel_socket.hpp`
+- `ParallelAcceptor<T>::start(port, handler)` — Multi-threaded TCP acceptor
+- `stop()` / `is_running()` / `active_connections()` / `total_accepted()`
 
 ---
 
@@ -82,6 +100,22 @@
 
 ### `websocket.hpp`
 - `WsFrame` — Frame encode/decode
+
+### `ws_client.hpp`
+- `WsClient::connect(url)` — HTTP upgrade + WebSocket handshake
+- `send_text()` / `send_binary()` / `send_ping()` — Message sending
+- `recv()` → `expected<WsMessage, Error>` — Auto ping/pong, fragmentation
+
+### `ws_server.hpp`
+- `WsServer::listen(port)` / `poll()` / `stop()` — WebSocket server lifecycle
+- `on_connect()` / `on_message()` / `on_disconnect()` — Per-connection callbacks
+- `broadcast(text)` — Send to all connected clients
+
+### `rest_client.hpp`
+- `RestClient::get()` / `post()` / `put()` / `patch()` / `del()` → `expected<RestResponse, Error>`
+- `post_json()` / `put_json()` / `patch_json()` — JSON body via zuu-json
+- `RestAuth::bearer()` / `basic()` — Authentication helpers
+- `RestResponse::parse_json(arena)` — Parse response body as JSON
 
 ---
 

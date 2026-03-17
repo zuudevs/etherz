@@ -61,6 +61,8 @@ enum class Error : uint8_t {
 	ProxyError,
 	ProxyAuthFailed,
 	RateLimited,
+	UpnpError,
+	StunError,
 	Unknown
 };
 
@@ -180,6 +182,8 @@ inline constexpr std::string_view error_message(Error err) noexcept {
 		case Error::ProxyError:          return "Proxy connection failed";
 		case Error::ProxyAuthFailed:     return "Proxy authentication failed";
 		case Error::RateLimited:         return "Rate limit exceeded";
+		case Error::UpnpError:           return "UPnP operation failed";
+		case Error::StunError:           return "STUN query failed";
 		case Error::Unknown:             return "Unknown error";
 	}
 	return "Unknown error";

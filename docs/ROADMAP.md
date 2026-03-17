@@ -1,10 +1,56 @@
 # Roadmap
 
-## Current Status: v3.0.0 (Stable)
+## Current Status: v4.0.0 (Stable)
 
-Core networking library is stable and production-ready. All milestones (v0.1–v3.0) are complete, including connection pooling, multicast, proxy/SOCKS5, rate limiting, platform I/O backends, Unix/serial, HTTP/2, gRPC, coroutines, DTLS, MQTT, FTP/SMTP, mDNS/DNS-SD, and compression.
+Core networking library is stable and production-ready. All milestones (v0.1–v4.0) are complete, including connection pooling, multicast, proxy/SOCKS5, rate limiting, platform I/O backends, Unix/serial, HTTP/2, gRPC, coroutines, DTLS, MQTT, FTP/SMTP, mDNS/DNS-SD, compression, NAT traversal, WebSocket client/server, REST utilities, and thread pool.
 
 ---
+
+## v4.0.0 — Thread Pool & Parallel I/O
+
+**Goal:** General-purpose thread pool and multi-threaded TCP server.
+
+- [x] `async/thread_pool.hpp` — Worker pool with `std::future`-based task submission, graceful shutdown
+- [x] `async/parallel_socket.hpp` — `ParallelAcceptor<T>` multi-threaded TCP acceptor with configurable workers
+- [x] `examples/threaded_server.cpp` — Multi-threaded HTTP server demo
+- [x] `tests/test_thread_pool.cpp` — Thread pool unit tests
+
+---
+
+## v3.3.0 — JSON & REST Utilities
+
+**Goal:** REST client with JSON support via zuu-json.
+
+- [x] `protocol/rest_client.hpp` — `RestClient` with typed REST verbs (GET/POST/PUT/PATCH/DELETE), Bearer/Basic auth, JSON body serialization via zuu-json
+- [x] Integrated `third_party/zuu-json` for parsing and serialization
+- [x] `examples/rest_api.cpp` — REST API usage demo
+- [x] `tests/test_rest.cpp` — REST client, auth, JSON parsing tests
+
+---
+
+## v3.2.0 — WebSocket Client & Server
+
+**Goal:** High-level WebSocket client and server with auto ping/pong.
+
+- [x] `protocol/ws_client.hpp` — `WsClient` with HTTP upgrade, auto ping/pong, fragmented message reassembly, close handshake, masking
+- [x] `protocol/ws_server.hpp` — `WsServer` with per-connection callbacks, broadcast, auto pong
+- [x] `examples/ws_chat.cpp` — WebSocket chat demo (server + client threads)
+- [x] `tests/test_ws_client.cpp` — Handshake, frame encode/decode, close codes tests
+
+---
+
+## v3.1.0 — NAT Traversal & UPnP
+
+**Goal:** NAT traversal utilities for P2P and port mapping.
+
+- [x] `net/upnp.hpp` — UPnP IGD client: SSDP discovery, SOAP port mapping (add/delete), external IP query
+- [x] `net/stun.hpp` — STUN client (RFC 5389): binding request, XOR-MAPPED-ADDRESS, NAT type detection
+- [x] `core/error.hpp` — Added `UpnpError`, `StunError` error codes
+- [x] `examples/nat_traversal.cpp` — Combined STUN + UPnP demo
+- [x] `tests/test_upnp.cpp`, `tests/test_stun.cpp` — Offline packet parsing tests
+
+---
+
 
 ## v0.2.0 — UDP & Socket Improvements
 

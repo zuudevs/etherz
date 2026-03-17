@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.0.0] — 2026-03-17
+
+### Added
+
+- **`async/thread_pool.hpp`** — General-purpose `ThreadPool` with `std::future`-based task submission, configurable worker count, graceful shutdown, pending-task queries
+- **`async/parallel_socket.hpp`** — `ParallelAcceptor<T>` multi-threaded TCP server acceptor with connection limits, active/total connection tracking
+- **`examples/threaded_server.cpp`** — Multi-threaded HTTP server demo with thread ID in JSON response
+- **`tests/test_thread_pool.cpp`** — Comprehensive thread pool tests: submission, futures, concurrency, shutdown, exception propagation
+
+---
+
+## [3.3.0] — 2026-03-17
+
+### Added
+
+- **`protocol/rest_client.hpp`** — `RestClient` with typed REST verbs (GET/POST/PUT/PATCH/DELETE), `RestResponse` with JSON parsing via zuu-json, `RestAuth` with Bearer and Basic auth helpers, configurable base URL and default headers
+- Integrated **zuu-json** from `third_party/` for JSON parsing and serialization
+- **`examples/rest_api.cpp`** — REST API demo using JSONPlaceholder
+- **`tests/test_rest.cpp`** — URL building, auth, response parsing, JSON body construction tests
+
+---
+
+## [3.2.0] — 2026-03-17
+
+### Added
+
+- **`protocol/ws_client.hpp`** — High-level `WsClient` with HTTP upgrade handshake, auto ping/pong, fragmented message reassembly, close handshake, client-side masking
+- **`protocol/ws_server.hpp`** — `WsServer` with per-connection `WsConnection` handles, connect/message/disconnect callbacks, broadcast, auto pong
+- **`examples/ws_chat.cpp`** — WebSocket chat demo with server and client threads
+- **`tests/test_ws_client.cpp`** — Handshake format, frame encode/decode round-trips, masked frames, close codes, message types
+
+---
+
+## [3.1.0] — 2026-03-17
+
+### Added
+
+- **`net/upnp.hpp`** — UPnP IGD client: SSDP M-SEARCH discovery, XML descriptor parsing, SOAP `AddPortMapping`/`DeletePortMapping`/`GetExternalIPAddress` actions
+- **`net/stun.hpp`** — STUN client (RFC 5389): binding request construction, XOR-MAPPED-ADDRESS and MAPPED-ADDRESS parsing, NAT type detection heuristic, `StunResult` with display
+- **`core/error.hpp`** — Added `UpnpError`, `StunError` error codes with messages
+- **`examples/nat_traversal.cpp`** — Combined STUN query + UPnP gateway discovery and port mapping demo
+- **`tests/test_upnp.cpp`** — SSDP message parsing, XML extraction, SOAP request building, URL parsing tests
+- **`tests/test_stun.cpp`** — Packet construction, XOR-MAPPED-ADDRESS/MAPPED-ADDRESS parsing, invalid response handling, NAT type string tests
+
+---
+
 ## [3.0.0] — 2026-03-16
 
 ### Added
